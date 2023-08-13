@@ -99,6 +99,10 @@ class LoginPage extends StatelessWidget {
                   login(emailController.text, passwordController.text)
                       .then((value) {
                     if (value == "pass") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
                       ScaffoldMessenger.of(context).showSnackBar(passSnackBar);
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(failSnackBar);

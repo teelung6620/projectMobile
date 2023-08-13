@@ -18,13 +18,19 @@ class RegisterPage extends StatelessWidget {
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
 
-  Future sign_up() async {
-    String url = "http://localhost:4000/";
-    final respone = await http.post(Uri.parse(url), body: {
-      'name': usernameController.text,
-      'pass': passwordController.text,
-      'email': emailController.text,
-    });
+  Future register(email, password, name) async {
+    var url = Uri.parse("http://10.0.2.2:4000/register");
+    var response = await http
+        .post(url, body: {'email': email, 'password': password, 'name': name});
+    // var responseData = response.body;
+    // debugPrint(responseData);
+    if (response.statusCode == 500) {
+      // ลงทะเบียนสำเร็จ
+      // นำผู้ใช้ไปยังหน้าอื่นๆ หรือทำอย่างอื่นตามความต้องการ
+    } else {
+      // ลงทะเบียนไม่สำเร็จ
+      // แสดงข้อความผิดพลาดหรือทำอย่างอื่นตามความต้องการ
+    }
   }
 
   Widget build(BuildContext context) {
@@ -84,26 +90,18 @@ class RegisterPage extends StatelessWidget {
                   height: 10,
                 ),
 
-                //Forget Password?
-                // const Padding(
-                //   padding: EdgeInsets.symmetric(horizontal: 25.0),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: [
-                //       Text(
-                //         'Forget Password?',
-                //         style: TextStyle(color: Colors.black),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
                 const SizedBox(
                   height: 10,
                 ),
 
                 MyButton2(
-                  onTap: RegistUserIn,
+                  onTap: () {
+                    register(usernameController.text, emailController.text,
+                            passwordController.text)
+                        .then((value) {
+                      if (value == "pass") {}
+                    });
+                  },
                 ),
 
                 const SizedBox(

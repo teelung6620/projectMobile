@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_mobile/components/my_button.dart';
 import '../components/my_textfield.dart';
 import 'package:project_mobile/pages/registTest.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatelessWidget {

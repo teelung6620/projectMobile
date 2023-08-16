@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_mobile/components/my_button.dart';
-import 'package:project_mobile/pages/registTest.dart';
 import 'package:project_mobile/pages/register_page.dart';
 import '../components/my_textfield.dart';
 import 'home.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatelessWidget {

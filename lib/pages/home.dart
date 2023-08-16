@@ -99,10 +99,12 @@ class _MyHomePageState extends State<HomePage> {
     final double categoryHeight = size.height * 0.30;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 218, 184, 255),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Image.asset("lib/assets/logoNew.png", width: 50),
           toolbarHeight: 60,
-          backgroundColor: Color.fromARGB(255, 132, 66, 217),
+          backgroundColor: Color.fromARGB(255, 182, 150, 239),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.search,
@@ -180,36 +182,46 @@ class _MyHomePageState extends State<HomePage> {
               },
               padding: EdgeInsets.all(16),
               tabs: [
-                // GButton(
-                //   icon: Icons.report_gmailerrorred,
-                //   text: 'Admin',
-                // ),
+                GButton(
+                  icon: Icons.home_outlined,
+                  text: 'Home',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
+                ),
                 GButton(
                   icon: Icons.add_circle_outline,
                   text: 'Add',
-                  // onPressed: () {
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(builder: (context) => LoginPage()),
-                  //   );
-                  // },
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
                 ),
                 GButton(
                   icon: Icons.bookmark_add_outlined,
                   text: 'Bookmark',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
                 ),
                 GButton(
-                  icon: Icons.add_circle_outline,
-                  text: 'Add',
+                  icon: Icons.book_outlined,
+                  text: 'Yours',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
                 ),
-                GButton(
-                  icon: Icons.home_outlined,
-                  text: 'Home',
-                ),
-                // GButton(
-                //   icon: Icons.logout,
-                //   text: 'Logout',
-                // ),
               ],
             ),
           ),
@@ -219,6 +231,7 @@ class _MyHomePageState extends State<HomePage> {
   }
 }
 
+//search
 class MySearchDelegate extends SearchDelegate {
   List<String> searchTerms = ['Fish', 'Pork', 'Chicken', 'meat'];
   @override

@@ -1,23 +1,25 @@
 class Product {
   final String name;
   final String type;
+  bool isSelected;
 
   Product({
     required this.name,
     required this.type,
+    required this.isSelected,
   });
 }
 
 final List<Product> FoodList = [
-  Product(name: 'ข้าวขาหมู', type: 'food'),
-  Product(name: 'ข้าวมันไก่', type: 'food'),
-  Product(name: 'ข้าวไข่เจียว', type: 'food'),
-  Product(name: 'ข้าวขาหมู', type: 'sweet'),
-  Product(name: 'ข้าวมันไก่', type: 'sweet'),
-  Product(name: 'ข้าวไข่เจียว', type: 'sweet'),
-  Product(name: 'coke', type: 'drink'),
-  Product(name: 'pepsi', type: 'drink'),
-  Product(name: 'fanta', type: 'drink'),
+  Product(name: 'ข้าวขาหมู', type: 'food', isSelected: false),
+  Product(name: 'ข้าวมันไก่', type: 'food', isSelected: false),
+  Product(name: 'ข้าวไข่เจียว', type: 'food', isSelected: false),
+  Product(name: 'ice-cream', type: 'sweet', isSelected: false),
+  Product(name: 'cake', type: 'sweet', isSelected: false),
+  Product(name: 'waffle', type: 'sweet', isSelected: false),
+  Product(name: 'coke', type: 'drink', isSelected: false),
+  Product(name: 'pepsi', type: 'drink', isSelected: false),
+  Product(name: 'fanta', type: 'drink', isSelected: false),
 ];
 
 // const FOOD_DATA = [

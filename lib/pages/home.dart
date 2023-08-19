@@ -32,26 +32,26 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Image.asset("lib/assets/logoNew.png", width: 50),
-        toolbarHeight: 60,
-        backgroundColor: const Color.fromARGB(255, 182, 150, 239),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.search,
-                color: Color.fromARGB(255, 255, 255, 255)),
-            onPressed: () {
-              showSearch(context: context, delegate: MySearchDelegate());
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.person,
-                color: Color.fromARGB(255, 255, 255, 255)),
-            onPressed: () {},
-          )
-        ],
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   title: Image.asset("lib/assets/logoNew.png", width: 50),
+      //   toolbarHeight: 60,
+      //   backgroundColor: const Color.fromARGB(255, 182, 150, 239),
+      //   actions: <Widget>[
+      //     IconButton(
+      //       icon: const Icon(Icons.search,
+      //           color: Color.fromARGB(255, 255, 255, 255)),
+      //       onPressed: () {
+      //         showSearch(context: context, delegate: MySearchDelegate());
+      //       },
+      //     ),
+      //     IconButton(
+      //       icon: const Icon(Icons.person,
+      //           color: Color.fromARGB(255, 255, 255, 255)),
+      //       onPressed: () {},
+      //     )
+      //   ],
+      // ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 182, 150, 239),

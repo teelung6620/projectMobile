@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../constant/constants.dart';
+import '../model/post.dart';
 import '../pages/home.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ListPage extends StatefulWidget {
   const ListPage({Key? key}) : super(key: key);
@@ -10,6 +13,37 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListState extends State<ListPage> {
+  List<Map<String, dynamic>> data = [];
+
+  // getPost() async {
+  //   var res = await http.get(Uri.parse('http://10.0.2.2:4000/data'));
+  //   try {
+  //     if (res.statusCode == 200) {
+  //       var data = PostTest(res.body);
+  //     } else {
+  //       print('Error');
+  //     }
+  //   } catch (e) {
+  //     print(e.toString());
+  //   }
+  // }
+
+  Future<void> fetchData() async {
+    var response = await http.get(Uri.parse('http://10.0.2.2:4000/data'));
+    if (response.statusCode == 200) {
+      final List<dynamic> responseData = json.decode(response.body);
+      if (responseData is List<Map<String, dynamic>>) {
+        setState(() {
+          data = responseData;
+        });
+      } else {
+        throw Exception('Invalid data format');
+      }
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
   @override
   String searchText = '';
   String selectedCategory = 'All';
@@ -17,9 +51,14 @@ class _ListState extends State<ListPage> {
 
   @override
   void initState() {
-    displayedItems = FoodList;
+    fetchData();
     super.initState();
   }
+  // @override
+  // void initState() {
+  //   displayedItems = FoodList;
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -63,79 +102,70 @@ class _ListState extends State<ListPage> {
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
-            DropdownButton<String>(
-              iconEnabledColor: Colors.white,
-              borderRadius: BorderRadius.circular(25.0),
-              dropdownColor: Colors.white,
-              value: selectedCategory,
-              onChanged: (newValue) {
-                setState(() {
-                  selectedCategory = newValue!;
-                  updateDisplayedItems(searchText);
-                });
-              },
-              items: [
-                'All',
-                'food',
-                'sweet',
-                'drink'
-              ] // Add more categories here...
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+            Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                ),
+                DropdownButton<String>(
+                  iconEnabledColor: Colors.white,
+                  borderRadius: BorderRadius.circular(25.0),
+                  dropdownColor: Colors.white,
+                  value: selectedCategory,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedCategory = newValue!;
+                      updateDisplayedItems(searchText);
+                    });
+                  },
+                  items: [
+                    'All',
+                    'food',
+                    'sweet',
+                    'drink'
+                  ] // Add more categories here...
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: displayedItems.length,
+                itemCount: data.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 10.0,
-                    margin: const EdgeInsets.all(7.2),
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Color.fromARGB(73, 255, 255, 255)),
-                      child: CheckboxListTile(
-                        title: Text(displayedItems[index].name),
-                        subtitle: Text(displayedItems[index].type),
-                        value: displayedItems[index].isSelected,
-                        onChanged: (value) {
-                          setState(() {
-                            displayedItems[index].isSelected = value!;
-                          });
-                        },
-                      ),
-                    ),
+                  return ListTile(
+                    title: Text(data[index]['name']),
+                    subtitle: Text(data[index]['type']),
                   );
-                  // return Card(
-                  //   elevation: 10.0,
-                  //   margin: const EdgeInsets.all(8.2),
-                  //   child: Container(
-                  //     decoration: const BoxDecoration(
-                  //       color: Color.fromARGB(255, 137, 107, 243),
-                  //     ),
-                  //     child: ListTile(
-                  //       contentPadding: const EdgeInsetsDirectional.symmetric(
-                  //           horizontal: 10, vertical: 10),
-                  //       title: Text(
-                  //         FoodList[index].name,
-                  //         style: const TextStyle(
-                  //             color: Colors.white,
-                  //             fontWeight: FontWeight.bold,
-                  //             fontSize: 18),
-                  //       ),
-                  //       subtitle: Text(
-                  //         FoodList[index].type,
-                  //         style: const TextStyle(
-                  //             color: Colors.white, fontStyle: FontStyle.italic),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // );
                 },
               ),
+              // ListView.builder(
+              //   itemCount: data.length,
+              //   itemBuilder: (context, index) {
+              //     return Card(
+              //       elevation: 10.0,
+              //       margin: const EdgeInsets.all(7.2),
+              //       child: Container(
+              //         decoration: BoxDecoration(
+              //             color: Color.fromARGB(73, 255, 255, 255)),
+              //         child: CheckboxListTile(
+              //           title: Text(data[index]['name']),
+              //           subtitle: Text(data[index]['type']),
+              //           value: displayedItems[index].isSelected,
+              //           onChanged: (value) {
+              //             setState(() {
+              //               displayedItems[index].isSelected = value!;
+              //             });
+              //           },
+              //         ),
+              //       ),
+              //     );
+              //   },
+              // ),
             ),
           ],
         ),

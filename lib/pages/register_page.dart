@@ -4,6 +4,8 @@ import 'package:project_mobile/pages/registTest.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
+import 'home.dart';
+
 class RegisterPage extends StatelessWidget {
   RegisterPage({super.key});
 
@@ -97,7 +99,12 @@ class RegisterPage extends StatelessWidget {
                     register(usernameController.text, emailController.text,
                             passwordController.text)
                         .then((value) {
-                      if (value == "pass") {}
+                      if (value == "pass") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomePage()),
+                        );
+                      }
                     });
                   },
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../constant/constants.dart';
 import '../model/post.dart';
+import '../model/userPost.dart';
 import '../pages/home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,70 +14,44 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListState extends State<ListPage> {
-  List<Map<String, dynamic>> data = [];
+  List<UserPost> posts = [];
 
-  // getPost() async {
-  //   var res = await http.get(Uri.parse('http://10.0.2.2:4000/data'));
-  //   try {
-  //     if (res.statusCode == 200) {
-  //       var data = PostTest(res.body);
-  //     } else {
-  //       print('Error');
-  //     }
-  //   } catch (e) {
-  //     print(e.toString());
-  //   }
-  // }
-
-  Future<void> fetchData() async {
-    var response = await http.get(Uri.parse('http://10.0.2.2:4000/data'));
-    if (response.statusCode == 200) {
-      final List<dynamic> responseData = json.decode(response.body);
-      if (responseData is List<Map<String, dynamic>>) {
-        setState(() {
-          data = responseData;
-        });
-      } else {
-        throw Exception('Invalid data format');
-      }
-    } else {
-      throw Exception('Failed to load data');
-    }
+  // get teams
+  Future getPost() async {
+    var url = Uri.parse("http://10.0.2.2:4000/post_data");
+    var response = await http.get(url);
+    posts = userPostFromJson(response.body);
   }
 
   @override
   String searchText = '';
   String selectedCategory = 'All';
-  List<Product> displayedItems = [];
+  List<UserPost> displayedItems = [];
 
   @override
   void initState() {
-    fetchData();
+    displayedItems = posts;
     super.initState();
+    getPost();
   }
-  // @override
-  // void initState() {
-  //   displayedItems = FoodList;
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
     void updateDisplayedItems(String query) {
       setState(() {
-        displayedItems = FoodList.where((item) => (item.name
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) &&
-                (selectedCategory == 'All' || item.type == selectedCategory)))
+        displayedItems = posts
+            .where((item) =>
+                (item.postName.toLowerCase().contains(query.toLowerCase()) &&
+                    (selectedCategory == 'All' ||
+                        item.postTypes == selectedCategory)))
             .toList();
       });
     }
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 237, 226, 255),
         body: Column(
-          children: <Widget>[
+          children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -102,70 +77,65 @@ class _ListState extends State<ListPage> {
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                ),
-                DropdownButton<String>(
-                  iconEnabledColor: Colors.white,
-                  borderRadius: BorderRadius.circular(25.0),
-                  dropdownColor: Colors.white,
-                  value: selectedCategory,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCategory = newValue!;
-                      updateDisplayedItems(searchText);
-                    });
-                  },
-                  items: [
-                    'All',
-                    'food',
-                    'sweet',
-                    'drink'
-                  ] // Add more categories here...
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(data[index]['name']),
-                    subtitle: Text(data[index]['type']),
+            // Row(
+            //   children: [
+            //     SizedBox(
+            //       width: 20,
+            //     ),
+            //     DropdownButton<String>(
+            //       iconEnabledColor: Colors.white,
+            //       borderRadius: BorderRadius.circular(25.0),
+            //       dropdownColor: Colors.white,
+            //       value: selectedCategory,
+            //       onChanged: (newValue) {
+            //         setState(() {
+            //           updateDisplayedItems(searchText);
+            //         });
+            //       },
+            //       items: [
+            //         'All',
+            //         'food',
+            //         'sweet',
+            //         'drink'
+            //       ] // Add more categories here...
+            //           .map<DropdownMenuItem<String>>((String value) {
+            //         return DropdownMenuItem<String>(
+            //           value: value,
+            //           child: Text(value),
+            //         );
+            //       }).toList(),
+            //     ),
+            //   ],
+            // ),
+            FutureBuilder(
+              future: getPost(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: posts.length,
+                      padding: EdgeInsets.all(8),
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ListTile(
+                              title: Text(posts[index].postName),
+                              subtitle: Text(posts[index].postTypes),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   );
-                },
-              ),
-              // ListView.builder(
-              //   itemCount: data.length,
-              //   itemBuilder: (context, index) {
-              //     return Card(
-              //       elevation: 10.0,
-              //       margin: const EdgeInsets.all(7.2),
-              //       child: Container(
-              //         decoration: BoxDecoration(
-              //             color: Color.fromARGB(73, 255, 255, 255)),
-              //         child: CheckboxListTile(
-              //           title: Text(data[index]['name']),
-              //           subtitle: Text(data[index]['type']),
-              //           value: displayedItems[index].isSelected,
-              //           onChanged: (value) {
-              //             setState(() {
-              //               displayedItems[index].isSelected = value!;
-              //             });
-              //           },
-              //         ),
-              //       ),
-              //     );
-              //   },
-              // ),
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              },
             ),
           ],
         ),

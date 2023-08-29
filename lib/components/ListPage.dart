@@ -15,39 +15,48 @@ class ListPage extends StatefulWidget {
 
 class _ListState extends State<ListPage> {
   List<UserPost> posts = [];
+  List<UserPost> newPosts = [];
 
   // get teams
   Future getPost() async {
     var url = Uri.parse("http://10.0.2.2:4000/post_data");
     var response = await http.get(url);
     posts = userPostFromJson(response.body);
+    print(posts);
+
+    // setState(() {
+    //   newPosts = posts;
+    // });
   }
 
-  @override
   String searchText = '';
   String selectedCategory = 'All';
-  List<UserPost> displayedItems = [];
 
   @override
   void initState() {
-    displayedItems = posts;
     super.initState();
     getPost();
   }
 
+  void updateposts(String value) {
+    setState(() {
+      if (value.isEmpty) {
+        newPosts = posts;
+      } else {
+        newPosts = posts
+            .where((element) => element.postName
+                .toString()
+                .toLowerCase()
+                .contains(value.toString().toLowerCase()))
+            .toList();
+      }
+    });
+    return;
+  }
+
+  //--------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    void updateDisplayedItems(String query) {
-      setState(() {
-        displayedItems = posts
-            .where((item) =>
-                (item.postName.toLowerCase().contains(query.toLowerCase()) &&
-                    (selectedCategory == 'All' ||
-                        item.postTypes == selectedCategory)))
-            .toList();
-      });
-    }
-
     return SafeArea(
       child: Scaffold(
         body: Column(
@@ -69,10 +78,9 @@ class _ListState extends State<ListPage> {
                       left: 15.0,
                     )),
                 onChanged: (value) {
-                  setState(() {
-                    searchText = value;
-                  });
-                  updateDisplayedItems(searchText);
+                  print(value);
+
+                  updateposts(value);
                 },
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
@@ -107,13 +115,13 @@ class _ListState extends State<ListPage> {
             //     ),
             //   ],
             // ),
-            FutureBuilder(
-              future: getPost(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: posts.length,
+            Expanded(
+              child: FutureBuilder(
+                future: getPost(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return ListView.builder(
+                      itemCount: newPosts.length,
                       padding: EdgeInsets.all(8),
                       itemBuilder: (context, index) {
                         return Padding(
@@ -130,12 +138,12 @@ class _ListState extends State<ListPage> {
                           ),
                         );
                       },
-                    ),
-                  );
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
             ),
           ],
         ),

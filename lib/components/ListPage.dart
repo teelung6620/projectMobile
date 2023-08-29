@@ -16,21 +16,17 @@ class ListPage extends StatefulWidget {
 class _ListState extends State<ListPage> {
   List<UserPost> posts = [];
   List<UserPost> newPosts = [];
-
+  String searchText = '';
   // get teams
   Future getPost() async {
     var url = Uri.parse("http://10.0.2.2:4000/post_data");
     var response = await http.get(url);
     posts = userPostFromJson(response.body);
-    print(posts);
 
-    // setState(() {
-    //   newPosts = posts;
-    // });
+    setState(() {
+      newPosts = posts;
+    });
   }
-
-  String searchText = '';
-  String selectedCategory = 'All';
 
   @override
   void initState() {
@@ -78,14 +74,43 @@ class _ListState extends State<ListPage> {
                       left: 15.0,
                     )),
                 onChanged: (value) {
-                  print(value);
-
+                  setState(() {
+                    searchText = value;
+                  });
                   updateposts(value);
                 },
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
-            // Row(
+            Expanded(
+                child: ListView.builder(
+              itemCount: newPosts.length,
+              padding: EdgeInsets.all(8),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ListTile(
+                      title: Text(newPosts[index].postName),
+                      subtitle: Text(newPosts[index].postTypes),
+                    ),
+                  ),
+                );
+              },
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// Row(
             //   children: [
             //     SizedBox(
             //       width: 20,
@@ -115,39 +140,3 @@ class _ListState extends State<ListPage> {
             //     ),
             //   ],
             // ),
-            Expanded(
-              child: FutureBuilder(
-                future: getPost(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ListView.builder(
-                      itemCount: newPosts.length,
-                      padding: EdgeInsets.all(8),
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ListTile(
-                              title: Text(posts[index].postName),
-                              subtitle: Text(posts[index].postTypes),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  } else {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

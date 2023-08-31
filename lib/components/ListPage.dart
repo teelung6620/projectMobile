@@ -17,6 +17,8 @@ class _ListState extends State<ListPage> {
   List<UserPost> posts = [];
   List<UserPost> newPosts = [];
   String searchText = '';
+  String selectedChips = 'All';
+
   // get teams
   Future getPost() async {
     var url = Uri.parse("http://10.0.2.2:4000/post_data");
@@ -50,11 +52,12 @@ class _ListState extends State<ListPage> {
     return;
   }
 
-  //--------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 231, 215, 255),
         body: Column(
           children: [
             Padding(
@@ -82,35 +85,7 @@ class _ListState extends State<ListPage> {
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
-            Expanded(
-                child: ListView.builder(
-              itemCount: newPosts.length,
-              padding: EdgeInsets.all(8),
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ListTile(
-                      title: Text(newPosts[index].postName),
-                      subtitle: Text(newPosts[index].postTypes),
-                    ),
-                  ),
-                );
-              },
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-// Row(
+            // Row(
             //   children: [
             //     SizedBox(
             //       width: 20,
@@ -122,13 +97,13 @@ class _ListState extends State<ListPage> {
             //       value: selectedCategory,
             //       onChanged: (newValue) {
             //         setState(() {
-            //           updateDisplayedItems(searchText);
+            //           chipupdateposts(searchText);
             //         });
             //       },
             //       items: [
             //         'All',
             //         'food',
-            //         'sweet',
+            //         'sweet',s
             //         'drink'
             //       ] // Add more categories here...
             //           .map<DropdownMenuItem<String>>((String value) {
@@ -140,3 +115,38 @@ class _ListState extends State<ListPage> {
             //     ),
             //   ],
             // ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: newPosts.length,
+                padding: EdgeInsets.all(8),
+                physics: BouncingScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      width: 20,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 255, 255, 255),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListTile(
+                        subtitleTextStyle: TextStyle(),
+                        titleTextStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: Checkbox.width,
+                            fontWeight: FontWeight.normal),
+                        title: Text(newPosts[index].postName),
+                        // subtitle: Text(newPosts[index].postTypes),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

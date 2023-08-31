@@ -24,7 +24,7 @@ class RegisterPage extends StatelessWidget {
         .post(url, body: {'email': email, 'password': password, 'name': name});
     // var responseData = response.body;
     // debugPrint(responseData);
-    if (response.statusCode == 500) {
+    if (response.statusCode == 200) {
       // ลงทะเบียนสำเร็จ
       // นำผู้ใช้ไปยังหน้าอื่นๆ หรือทำอย่างอื่นตามความต้องการ
     } else {

@@ -31,7 +31,7 @@ class _MyHomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       // appBar: AppBar(
       //   automaticallyImplyLeading: false,
       //   title: Image.asset("lib/assets/logoNew.png", width: 50),
@@ -56,7 +56,7 @@ class _MyHomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 182, 150, 239),
         selectedItemColor: Colors.white,
-        unselectedItemColor: const Color.fromARGB(179, 255, 255, 255),
+        unselectedItemColor: Color.fromARGB(179, 65, 34, 100),
         currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,
         type: BottomNavigationBarType.fixed,
@@ -75,62 +75,62 @@ class _MyHomePageState extends State<HomePage> {
 }
 
 //search
-class MySearchDelegate extends SearchDelegate {
-  List<String> searchTerms = ['Fish', 'Pork', 'Chicken', 'meat'];
-  @override
-  List<Widget>? buildActions(BuildContext context) {
-    return [
-      IconButton(
-        icon: Icon(Icons.close),
-        onPressed: () {
-          query = '';
-        },
-      )
-    ];
-  }
+// class MySearchDelegate extends SearchDelegate {
+//   List<String> searchTerms = ['Fish', 'Pork', 'Chicken', 'meat'];
+//   @override
+//   List<Widget>? buildActions(BuildContext context) {
+//     return [
+//       IconButton(
+//         icon: Icon(Icons.close),
+//         onPressed: () {
+//           query = '';
+//         },
+//       )
+//     ];
+//   }
 
-  @override
-  Widget? buildLeading(BuildContext context) => IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () => close(context, null),
-      );
+//   @override
+//   Widget? buildLeading(BuildContext context) => IconButton(
+//         icon: Icon(Icons.arrow_back),
+//         onPressed: () => close(context, null),
+//       );
 
-  @override
-  Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var food in searchTerms) {
-      if (food.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(food);
-      }
-    }
-    return ListView.builder(
-      itemCount: matchQuery.length,
-      itemBuilder: (context, index) {
-        var result = matchQuery[index];
-        return ListTile(
-          title: Text(result),
-        );
-      },
-    );
-  }
+//   @override
+//   Widget buildResults(BuildContext context) {
+//     List<String> matchQuery = [];
+//     for (var food in searchTerms) {
+//       if (food.toLowerCase().contains(query.toLowerCase())) {
+//         matchQuery.add(food);
+//       }
+//     }
+//     return ListView.builder(
+//       itemCount: matchQuery.length,
+//       itemBuilder: (context, index) {
+//         var result = matchQuery[index];
+//         return ListTile(
+//           title: Text(result),
+//         );
+//       },
+//     );
+//   }
 
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var food in searchTerms) {
-      if (food.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(food);
-      }
-    }
-    return Container(
-      color: Color.fromARGB(255, 210, 193, 241),
-      child: ListView.builder(
-        itemCount: matchQuery.length,
-        itemBuilder: (context, index) {
-          var result = matchQuery[index];
-          return ListTile(title: Text(result));
-        },
-      ),
-    );
-  }
-}
+//   @override
+//   Widget buildSuggestions(BuildContext context) {
+//     List<String> matchQuery = [];
+//     for (var food in searchTerms) {
+//       if (food.toLowerCase().contains(query.toLowerCase())) {
+//         matchQuery.add(food);
+//       }
+//     }
+//     return Container(
+//       color: Color.fromARGB(255, 210, 193, 241),
+//       child: ListView.builder(
+//         itemCount: matchQuery.length,
+//         itemBuilder: (context, index) {
+//           var result = matchQuery[index];
+//           return ListTile(title: Text(result));
+//         },
+//       ),
+//     );
+//   }
+// }

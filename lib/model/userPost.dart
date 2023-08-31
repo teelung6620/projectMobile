@@ -29,3 +29,23 @@ class UserPost {
         "post_types": postTypes,
       };
 }
+
+class PostImage {
+  String type;
+  List<dynamic> data;
+
+  PostImage({
+    required this.type,
+    required this.data,
+  });
+
+  factory PostImage.fromJson(Map<String, dynamic> json) => PostImage(
+        type: json["type"],
+        data: List<dynamic>.from(json["data"].map((x) => x)),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "type": type,
+        "data": List<dynamic>.from(data.map((x) => x)),
+      };
+}

@@ -7,6 +7,13 @@ import '../pages/home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+enum postFilter {
+  ALL,
+  food,
+  sweet,
+  drink,
+}
+
 class ListPage extends StatefulWidget {
   const ListPage({Key? key}) : super(key: key);
   @override
@@ -16,8 +23,8 @@ class ListPage extends StatefulWidget {
 class _ListState extends State<ListPage> {
   List<UserPost> posts = [];
   List<UserPost> newPosts = [];
-  String searchText = '';
-  String selectedChips = 'All';
+  List<String> selectedChips = [];
+  TextEditingController _searchController = TextEditingController();
 
   // get teams
   Future getPost() async {
@@ -36,25 +43,49 @@ class _ListState extends State<ListPage> {
     getPost();
   }
 
-  void updateposts(String value) {
+  // void updateposts(String value) {
+  //   setState(() {
+  //     if (value.isEmpty) {
+  //       newPosts = posts;
+  //     } else {
+  //       newPosts = posts
+  //           .where((element) => element.postName
+  //               .toLowerCase()
+  //               .contains(value.toLowerCase())&& (selectedChips == 'All' ||postFilter.all == selectedChips))
+  //           .toList();
+  //     }
+  //   });
+  //   return;
+  // }
+  void updateposts() {
     setState(() {
-      if (value.isEmpty) {
+      if (selectedChips.isEmpty) {
         newPosts = posts;
       } else {
-        newPosts = posts
-            .where((element) => element.postName
-                .toString()
-                .toLowerCase()
-                .contains(value.toString().toLowerCase()))
-            .toList();
+        newPosts = posts.where((result) {
+          return selectedChips.any((chip) => result.postTypes.contains(chip));
+        }).toList();
       }
     });
     return;
   }
 
+  void _toggleChip(String chipLabel) {
+    setState(() {
+      if (selectedChips.contains(chipLabel)) {
+        selectedChips.remove(chipLabel);
+      } else {
+        selectedChips.add(chipLabel);
+      }
+      updateposts(); // เมื่อเลือก/ยกเลิกชิป จะกรองรายการใหม่
+    });
+  }
+
   //--------------------------------------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Color.fromARGB(255, 231, 215, 255),
@@ -76,15 +107,69 @@ class _ListState extends State<ListPage> {
                     contentPadding: EdgeInsets.only(
                       left: 15.0,
                     )),
-                onChanged: (value) {
+                onChanged: (query) {
                   setState(() {
-                    searchText = value;
+                    newPosts = posts
+                        .where((result) => result.postName
+                            .toLowerCase()
+                            .contains(query.toLowerCase()))
+                        .toList();
                   });
-                  updateposts(value);
                 },
+                controller: _searchController,
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
+
+            Row(
+              children: [
+                const SizedBox(height: 5.0),
+                const SizedBox(width: 18.0),
+                Text(
+                  'filters',
+                  style: textTheme.labelLarge,
+                ),
+                SizedBox(
+                  width: 5.0,
+                ),
+                Wrap(
+                  children: [
+                    FilterChip(
+                      label: Text('food'),
+                      selected: selectedChips.contains('food'),
+                      onSelected: (_) => _toggleChip('food'),
+                      selectedColor: Color.fromARGB(255, 214, 165, 255),
+                      backgroundColor: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    FilterChip(
+                      label: Text('sweet'),
+                      selected: selectedChips.contains('sweet'),
+                      onSelected: (_) => _toggleChip('sweet'),
+                      selectedColor: Color.fromARGB(255, 214, 165, 255),
+                      backgroundColor: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    FilterChip(
+                      label: Text('drink'),
+                      selected: selectedChips.contains('drink'),
+                      onSelected: (_) => _toggleChip('drink'),
+                      selectedColor: Color.fromARGB(255, 214, 165, 255),
+                      backgroundColor: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 5.0,
+                    ),
+                    // เพิ่ม Filter Chip
+                  ],
+                ),
+              ],
+            ),
+
             // Row(
             //   children: [
             //     SizedBox(

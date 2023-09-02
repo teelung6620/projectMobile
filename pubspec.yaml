@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   easy_search_bar: ^2.5.0
+  api_cache_manager: ^1.0.2
+  # snippetcoder_utils: ^1.0.9
 
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:project_mobile/model/register_request_model.dart';
 import '../components/my_textfield.dart';
 import 'package:project_mobile/pages/registTest.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
+import '../services/api_service.dart';
 import 'home.dart';
 
-class RegisterPage extends StatelessWidget {
-  RegisterPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   void RegistUserIn() {}
+  bool isApiCallProcess = false;
+  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+  String? userEmail;
+  String? userPassword;
+  String? userName;
 
   @override
   final formKey = GlobalKey<FormState>();
@@ -34,6 +46,7 @@ class RegisterPage extends StatelessWidget {
   }
 
   Widget build(BuildContext context) {
+    const passSnackBar = SnackBar(content: Text("Register Successed"));
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: const Color.fromARGB(255, 235, 255, 250),
@@ -96,16 +109,38 @@ class RegisterPage extends StatelessWidget {
 
                 MyButton2(
                   onTap: () {
-                    register(usernameController.text, emailController.text,
-                            passwordController.text)
-                        .then((value) {
-                      if (value == "pass") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                        );
-                      }
-                    });
+                    if (validateAndSave()) {
+                      setState(() {
+                        isApiCallProcess = true;
+                      });
+
+                      RegisterRequestModel model = RegisterRequestModel(
+                          userEmail: userEmail!,
+                          userName: userName!,
+                          userPassword: userPassword!);
+
+                      APIService.register(model).then((response) {
+                        setState(() {
+                          isApiCallProcess = false;
+                        });
+                        if (response.users != null) {
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(passSnackBar);
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/login', (route) => false);
+                        } else {}
+                      });
+                    }
+                    // register(usernameController.text, emailController.text,
+                    //         passwordController.text)
+                    //     .then((value) {
+                    //   if (value == "pass") {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => HomePage()),
+                    //     );
+                    //   }
+                    // });
                   },
                 ),
 
@@ -134,5 +169,15 @@ class RegisterPage extends StatelessWidget {
             ),
           ),
         ));
+  }
+
+  bool validateAndSave() {
+    final form = globalFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
   }
 }

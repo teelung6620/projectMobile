@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:project_mobile/components/my_button.dart';
+import 'package:project_mobile/model/login_request_model.dart';
 import 'package:project_mobile/pages/register_page.dart';
+import 'package:project_mobile/services/api_service.dart';
 import '../components/my_textfield.dart';
 import 'home.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool isApiCallProcess = false;
+  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+  String? userEmail;
+  String? userPassword;
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   Future<String> login(email, password) async {
     var url = Uri.parse("http://10.0.2.2:4000/login");
-    var response =
-        await http.post(url, body: {'email': email, 'password': password});
+    var response = await http.post(url,
+        body: {'user_email': userEmail, 'user_password': userPassword});
     var responseData = response.body;
     debugPrint(responseData);
     if (responseData == "true") {
@@ -58,7 +70,7 @@ class LoginPage extends StatelessWidget {
               MyTextField(
                 controller: emailController,
                 hintText: 'Email',
-                obscureText: false,
+                obscureText: true,
               ),
               const SizedBox(
                 height: 10,
@@ -94,18 +106,40 @@ class LoginPage extends StatelessWidget {
 
               MyButton(
                 onTap: () {
-                  login(emailController.text, passwordController.text)
-                      .then((value) {
-                    if (value == "pass") {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(passSnackBar);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(failSnackBar);
-                    }
-                  });
+                  if (validateAndSave()) {
+                    setState(() {
+                      isApiCallProcess = true;
+                    });
+
+                    LoginRequestModel model = LoginRequestModel(
+                        userEmail: userEmail!, userPassword: userPassword!);
+
+                    APIService.login(model).then((response) {
+                      setState(() {
+                        isApiCallProcess = false;
+                      });
+
+                      if (response) {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/home', (route) => false);
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(failSnackBar);
+                      }
+                    });
+                  }
+                  // login(emailController.text, passwordController.text)
+                  //     .then((value) {
+                  //   if (value == "pass") {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) => HomePage()),
+                  //     );
+                  //     ScaffoldMessenger.of(context).showSnackBar(passSnackBar);
+                  //   } else {
+                  //     ScaffoldMessenger.of(context).showSnackBar(failSnackBar);
+                  //   }
+                  // });
                 },
               ),
 
@@ -166,5 +200,15 @@ class LoginPage extends StatelessWidget {
             ]),
           ),
         ));
+  }
+
+  bool validateAndSave() {
+    final form = globalFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
   }
 }

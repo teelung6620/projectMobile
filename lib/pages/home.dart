@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:project_mobile/components/my_button.dart';
 import 'package:project_mobile/pages/addPage.dart';
 import 'package:project_mobile/pages/bookmarkPage.dart';
 import 'package:project_mobile/pages/login_page.dart';
+import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
 import 'package:project_mobile/pages/register_page.dart';
 import 'package:project_mobile/pages/yoursPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../auth/auth_screen.dart';
 import '../components/ListPage.dart';
 import '../components/my_textfield.dart';
 import '../constant/constants.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  final token;
+  HomePage({@required this.token, Key? key}) : super(key: key);
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<HomePage> {
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   int _selectedIndex = 0;
 
   void _navigateBottomBar(int index) {
@@ -31,6 +38,18 @@ class _MyHomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(actions: [
+      //   TextButton(
+      //       onPressed: () async {
+      //         final SharedPreferences? prefs = await _prefs;
+      //         prefs?.clear();
+      //         Get.offAll(LoginScreen());
+      //       },
+      //       child: Text(
+      //         'logout',
+      //         style: TextStyle(color: Colors.white),
+      //       ))
+      // ]),
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       // appBar: AppBar(
       //   automaticallyImplyLeading: false,
@@ -52,6 +71,19 @@ class _MyHomePageState extends State<HomePage> {
       //     )
       //   ],
       // ),
+      // body: TextButton(
+      //     onPressed: () async {
+      //       final SharedPreferences? prefs = await _prefs;
+      //       print(prefs?.get('token'));
+      //     },
+      //     child: Text('print token'))
+
+      // body: TextButton(
+      //     onPressed: () async {
+      //       final SharedPreferences? prefs = await _prefs;
+      //       print(prefs?.get('token'));
+      //     },
+      //     child: Text('print token')),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color.fromARGB(255, 182, 150, 239),

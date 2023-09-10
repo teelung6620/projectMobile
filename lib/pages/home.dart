@@ -11,7 +11,7 @@ import 'package:project_mobile/pages/register_page.dart';
 import 'package:project_mobile/pages/yoursPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../auth/auth_screen.dart';
-import '../components/ListPage.dart';
+import 'ListPage.dart';
 import '../components/my_textfield.dart';
 import '../constant/constants.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';

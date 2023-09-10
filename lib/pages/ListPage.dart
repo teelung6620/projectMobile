@@ -3,7 +3,8 @@ import 'package:flutter/rendering.dart';
 import '../constant/constants.dart';
 import '../model/post.dart';
 import '../model/userPost.dart';
-import '../pages/home.dart';
+import 'detail_page.dart';
+import 'home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -215,14 +216,31 @@ class _ListState extends State<ListPage> {
                         color: Color.fromARGB(255, 255, 255, 255),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: ListTile(
-                        subtitleTextStyle: TextStyle(),
-                        titleTextStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: Checkbox.width,
-                            fontWeight: FontWeight.normal),
-                        title: Text(newPosts[index].postName),
-                        // subtitle: Text(newPosts[index].postTypes),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DetailPage(
+                                      userP: posts[index],
+                                    )),
+                          );
+                        },
+                        child: Align(
+                          alignment: FractionalOffset.bottomCenter,
+                          child: ListTile(
+                            subtitleTextStyle: TextStyle(),
+                            titleTextStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 25,
+                                fontWeight: FontWeight.normal),
+                            title: Text(newPosts[index].postName),
+                            // subtitle: Text(newPosts[index].postTypes),
+                          ),
+                        ),
                       ),
                     ),
                   );

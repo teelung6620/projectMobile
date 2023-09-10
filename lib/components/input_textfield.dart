@@ -18,9 +18,11 @@ class InputTextFieldWidget extends StatelessWidget {
                 borderSide: BorderSide(color: Colors.black)),
             fillColor: Colors.white54,
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey),
-            contentPadding: EdgeInsets.only(bottom: 15),
-            focusColor: Colors.white60),
+            hintStyle: TextStyle(color: Color.fromARGB(255, 180, 143, 209)),
+            contentPadding: EdgeInsets.all(15),
+            focusColor: Colors.white60,
+            border:
+                OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
       ),
     );
   }

@@ -22,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 229, 214, 255),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(36),
@@ -32,17 +33,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 30,
+                      height: 80,
                     ),
-                    Container(
-                      child: Text(
-                        'WELCOME',
-                        style: TextStyle(
-                            fontSize: 30,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400),
-                      ),
+                    Image.asset(
+                      'lib/assets/logoNew.png',
+                      scale: 2.5,
                     ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Text('Thank you for coming into our lives.'),
                     SizedBox(
                       height: 20,
                     ),
@@ -50,22 +50,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     SizedBox(
                       height: 20,
                     ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
-                        );
-                      },
-                      child: const Text(
-                        'Login',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 52, 230, 168),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Already have an account '),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginScreen()),
+                            );
+                          },
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 113, 49, 210),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ]),
             ),
@@ -78,17 +84,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget registerWidget() {
     return Column(
       children: [
-        InputTextFieldWidget(registerationController.nameController, 'name'),
+        InputTextFieldWidget(registerationController.nameController, 'Name'),
         SizedBox(
           height: 20,
         ),
         InputTextFieldWidget(
-            registerationController.emailController, 'email address'),
+          registerationController.emailController,
+          'Email address',
+        ),
         SizedBox(
           height: 20,
         ),
         InputTextFieldWidget(
-            registerationController.passwordController, 'password'),
+            registerationController.passwordController, 'Password'),
         SizedBox(
           height: 20,
         ),

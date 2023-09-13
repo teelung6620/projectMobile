@@ -24,24 +24,24 @@ class AddPage extends StatelessWidget {
   }
 
   Future<void> uploadImage(String imagePath) async {
-  final url = Uri.parse('YOUR_NODEJS_SERVER_UPLOAD_URL'); // เปลี่ยนเป็น URL ของเซิร์ฟเวอร์ Node.js
+    final url = Uri.parse(
+        'localhost:4000/uploadImage'); // เปลี่ยนเป็น URL ของเซิร์ฟเวอร์ Node.js
 
-  var request = http.MultipartRequest('POST', url);
-  request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+    var request = http.MultipartRequest('PATCH', url);
+    request.files
+        .add(await http.MultipartFile.fromPath('user_image', imagePath));
 
-  try {
-    final response = await request.send();
-    if (response.statusCode == 200) {
-      print('Upload success');
-    } else {
-      print('Upload failed with status ${response.statusCode}');
+    try {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        print('Upload success');
+      } else {
+        print('Upload failed with status ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Upload failed: $e');
     }
-  } catch (e) {
-    print('Upload failed: $e');
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {

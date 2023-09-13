@@ -39,6 +39,16 @@ class RegisterationController extends GetxController {
           passwordController.clear();
           Get.off(LoginScreen());
         }
+        if (json['error'] == 'Your email is already in use') {
+          showDialog(
+              context: Get.context!,
+              builder: (context) {
+                return SimpleDialog(
+                  title: Text('Your email is already in use'),
+                  contentPadding: EdgeInsets.all(20),
+                );
+              });
+        }
       }
     } catch (e) {
       Get.back();

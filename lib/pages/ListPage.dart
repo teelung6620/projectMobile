@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../components/submitButton.dart';
 import '../constant/constants.dart';
 import '../model/post.dart';
 import '../model/userPost.dart';
@@ -7,6 +11,8 @@ import 'detail_page.dart';
 import 'home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'login_page2.dart';
 
 enum postFilter {
   ALL,
@@ -27,6 +33,12 @@ class _ListState extends State<ListPage> {
   List<String> selectedChips = [];
   TextEditingController _searchController = TextEditingController();
 
+  Logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    Get.offAll(LoginScreen());
+  }
+
   // get teams
   Future getPost() async {
     var url = Uri.parse("http://10.0.2.2:4000/post_data");
@@ -35,8 +47,26 @@ class _ListState extends State<ListPage> {
 
     setState(() {
       newPosts = posts;
+      newPosts.forEach((element) {
+        imagesUrl.add(element.postImage);
+      });
     });
   }
+
+  List imagesUrl = [];
+  // Future<String> fetchDataFromApi() async {
+  //   var url = Uri.parse("http://10.0.2.2:4000/updatePostImage");
+
+  //   var jsonData = await http.get(url);
+  //   var fetchData = jsonDecode(jsonData.body);
+  //   setState(() {
+  //     newPosts = fetchData;
+  //     newPosts.forEach((element) {
+  //       imagesUrl.add(element.postImage);
+  //     });
+  //   });
+  //   return "Success";
+  // }
 
   @override
   void initState() {
@@ -89,9 +119,16 @@ class _ListState extends State<ListPage> {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 231, 215, 255),
+        backgroundColor: Color.fromARGB(255, 245, 238, 255),
         body: Column(
           children: [
+            SubmitButton(
+              onPressed: () //=> postController.postMenuUser(),
+                  {
+                Logout();
+              },
+              title: 'Log out',
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
@@ -207,6 +244,7 @@ class _ListState extends State<ListPage> {
                 padding: EdgeInsets.all(8),
                 physics: BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
+                  var reverseindex = newPosts.length - 1 - index;
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -225,20 +263,32 @@ class _ListState extends State<ListPage> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => DetailPage(
-                                      userP: posts[index],
+                                      userP: posts[reverseindex],
                                     )),
                           );
                         },
                         child: Align(
                           alignment: FractionalOffset.bottomCenter,
                           child: ListTile(
-                            subtitleTextStyle: TextStyle(),
+                            subtitleTextStyle: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.normal),
                             titleTextStyle: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 25,
                                 fontWeight: FontWeight.normal),
-                            title: Text(newPosts[index].postName),
-                            // subtitle: Text(newPosts[index].postTypes),
+                            leading: CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
+                                  scale: 2),
+                            ),
+                            title: Text(
+                              newPosts[reverseindex].postName,
+                              textAlign: TextAlign.right,
+                            ),
+                            subtitle: Text(
+                              newPosts[reverseindex].userName,
+                              textAlign: TextAlign.right,
+                            ),
                           ),
                         ),
                       ),

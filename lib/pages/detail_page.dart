@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_mobile/model/userPost.dart';
@@ -24,10 +25,28 @@ class DetailPage extends StatelessWidget {
         toolbarHeight: 60,
       ),
       backgroundColor: const Color.fromARGB(255, 231, 215, 255),
-      body: Center(
-        child: Text(
-          userP.postName,
-          style: TextStyle(fontSize: 20),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                ),
+                Text(
+                  userP.userName,
+                  style: TextStyle(fontSize: 20),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Text(userP.postDescription),
+          ],
         ),
       ),
     );

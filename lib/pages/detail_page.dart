@@ -11,6 +11,8 @@ import '../model/teamTest.dart';
 class DetailPage extends StatelessWidget {
   const DetailPage({super.key, required this.userP});
   final UserPost userP;
+
+  final url = 'http://10.0.2.2:4000/uploadPostImage/';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,21 +33,50 @@ class DetailPage extends StatelessWidget {
             SizedBox(
               height: 20,
             ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                ),
-                Text(
-                  userP.userName,
-                  style: TextStyle(fontSize: 20),
-                ),
-              ],
+            Image(
+              image: NetworkImage(
+                'http://10.0.2.2:4000/uploadPostImage/${userP.postImage}',
+              ),
+              width: 300, // กำหนดความกว้าง
+              height: 300,
             ),
-            SizedBox(
+            Text(
+              userP.userName,
+              style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.right,
+            ),
+            Text(
+              'วิธีทำ',
+              textAlign: TextAlign.left,
+            ),
+            const SizedBox(
               height: 20,
             ),
             Text(userP.postDescription),
+            Text(
+              userP.ningred,
+              style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.right,
+            ),
+            Row(
+              children: [
+                Text(
+                  userP.uingred,
+                  style: const TextStyle(fontSize: 20),
+                  textAlign: TextAlign.right,
+                ),
+                Text(
+                  'กรัม',
+                  style: const TextStyle(fontSize: 20),
+                  textAlign: TextAlign.right,
+                ),
+              ],
+            ),
+            Text(
+              userP.cingred,
+              style: const TextStyle(fontSize: 20),
+              textAlign: TextAlign.right,
+            ),
           ],
         ),
       ),

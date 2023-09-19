@@ -32,6 +32,7 @@ class _ListState extends State<ListPage> {
   List<UserPost> newPosts = [];
   List<String> selectedChips = [];
   TextEditingController _searchController = TextEditingController();
+  List<UserPost> _split = [];
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -249,7 +250,7 @@ class _ListState extends State<ListPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                       width: 20,
-                      height: 120,
+                      height: 80,
                       decoration: BoxDecoration(
                         color: Color.fromARGB(255, 255, 255, 255),
                         borderRadius: BorderRadius.circular(8),
@@ -267,8 +268,26 @@ class _ListState extends State<ListPage> {
                                     )),
                           );
                         },
+                        // child: Row(
+                        //   children: [
+                        //     Image(
+                        //         image: NetworkImage(
+                        //       'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
+                        //     )),
+                        //     Text(
+                        //       newPosts[reverseindex].postName,
+                        //       style: TextStyle(color: Colors.black),
+                        //       textAlign: TextAlign.right,
+                        //     ),
+                        //     Text(
+                        //       newPosts[reverseindex].userName,
+                        //       style: TextStyle(color: Colors.black),
+                        //       textAlign: TextAlign.right,
+                        //     ),
+                        //   ],
+                        // ),
                         child: Align(
-                          alignment: FractionalOffset.bottomCenter,
+                          // alignment: FractionalOffset.bottomCenter,
                           child: ListTile(
                             subtitleTextStyle: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.normal),
@@ -276,10 +295,10 @@ class _ListState extends State<ListPage> {
                                 color: Colors.black,
                                 fontSize: 25,
                                 fontWeight: FontWeight.normal),
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                                  scale: 2),
+                            leading: Image(
+                              image: NetworkImage(
+                                'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
+                              ),
                             ),
                             title: Text(
                               newPosts[reverseindex].postName,

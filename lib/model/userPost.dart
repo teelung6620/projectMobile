@@ -30,8 +30,12 @@ class UserPost {
   int ingredientsCal;
   String iDingred;
   String ningred;
+  List<String> separatedNingred;
   String uingred;
+  List<String> separatedUingred;
   String cingred;
+  List<String> separatedCingred;
+  String cingredAll;
 
   UserPost({
     required this.postId,
@@ -55,7 +59,10 @@ class UserPost {
     required this.ningred,
     required this.uingred,
     required this.cingred,
-  });
+    required this.cingredAll,
+  })  : separatedNingred = ningred.split(','),
+        separatedUingred = uingred.split(','),
+        separatedCingred = cingred.split(',');
 
   factory UserPost.fromJson(Map<String, dynamic> json) => UserPost(
         postId: json["post_id"],
@@ -79,6 +86,7 @@ class UserPost {
         ningred: json["Ningred"],
         uingred: json["Uingred"],
         cingred: json["Cingred"],
+        cingredAll: json["CingredALL"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -103,5 +111,6 @@ class UserPost {
         "Ningred": ningred,
         "Uingred": uingred,
         "Cingred": cingred,
+        "CingredALL": cingredAll,
       };
 }

@@ -46,36 +46,57 @@ class DetailPage extends StatelessWidget {
               textAlign: TextAlign.right,
             ),
             Text(
+              'ส่วนผสม',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 20),
+            ),
+            Row(
+              children: [
+                Column(
+                    children: userP.separatedNingred.map((ingredient) {
+                  return Text(
+                    ingredient + ' ',
+                    style: const TextStyle(fontSize: 15),
+                    textAlign: TextAlign.left,
+                  );
+                }).toList()),
+                Column(
+                    children: userP.separatedUingred.map((gram) {
+                  int intGram = int.tryParse(gram) ?? 0;
+                  String textToDisplay = gram;
+                  if (intGram >= 100) {
+                    textToDisplay = intGram.toString() + ' กรัม';
+                  } else {
+                    textToDisplay = intGram.toString() + ' ช้อนชา';
+                  }
+                  return Text(
+                    textToDisplay,
+                    style: const TextStyle(fontSize: 15),
+                    textAlign: TextAlign.left,
+                  );
+                }).toList()),
+                Column(
+                    children: userP.separatedCingred.map((cal) {
+                  return Text(
+                    ' CAL : ' + cal,
+                    style: const TextStyle(fontSize: 15),
+                    textAlign: TextAlign.left,
+                  );
+                }).toList()),
+              ],
+            ),
+            Text(userP.cingredAll),
+            Text(
               'วิธีทำ',
               textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 20),
             ),
             const SizedBox(
               height: 20,
             ),
             Text(userP.postDescription),
-            Text(
-              userP.ningred,
-              style: const TextStyle(fontSize: 20),
-              textAlign: TextAlign.right,
-            ),
-            Row(
-              children: [
-                Text(
-                  userP.uingred,
-                  style: const TextStyle(fontSize: 20),
-                  textAlign: TextAlign.right,
-                ),
-                Text(
-                  'กรัม',
-                  style: const TextStyle(fontSize: 20),
-                  textAlign: TextAlign.right,
-                ),
-              ],
-            ),
-            Text(
-              userP.cingred,
-              style: const TextStyle(fontSize: 20),
-              textAlign: TextAlign.right,
+            const SizedBox(
+              height: 15,
             ),
           ],
         ),

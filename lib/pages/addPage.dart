@@ -4,6 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
+import 'package:project_mobile/model/Ingredients.list.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
@@ -27,6 +28,68 @@ class AddPage extends StatefulWidget {
 class _AddState extends State<AddPage> {
   PostController postController = Get.put(PostController());
   late int user_id;
+  TextEditingController _searchController = TextEditingController();
+  List<IngredientList> _searchResults = [];
+  List<IngredientList> IGDResults = [];
+  //List<IngredientList> _selectedResults = [];
+  //bool _isSelected = false;
+  List<IngredientList> _selectedIngredients = [];
+  IngredientList? _selectedIngredient;
+
+  Future getIGD() async {
+    var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
+    var response = await http.get(url);
+    IGDResults = ingredientListFromJson(response.body);
+
+    setState(() {
+      _searchResults = IGDResults.where((result) =>
+              result.ingredientsName.toLowerCase().contains(
+                    _searchController.text.toLowerCase(),
+                  ) &&
+              !_selectedIngredients.contains(result))
+          .toList(); // ตรวจสอบว่าไม่ถูกเลือกแล้วถึงเพิ่มลงใน _searchResults
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getIGD();
+  }
+
+  _onSearchChanged() {
+    setState(() {
+      _searchResults = IGDResults.where(
+          (result) => result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              )).toList();
+    });
+  }
+
+  void _onIngredientRemoved(IngredientList ingredient) {
+    setState(() {
+      _selectedIngredients.remove(ingredient);
+      _searchResults = IGDResults.where((result) =>
+          result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              ) &&
+          !_selectedIngredients.contains(result)).toList();
+    });
+  }
+
+  void _refreshChoiceChips() {
+    setState(() {
+      // รีเฟรช ChoiceChips โดยลบทุก Ingredient ออกจาก _selectedIngredients
+      _selectedIngredients.clear();
+
+      // รีเฟรชรายการที่แสดงใหม่โดยใช้เงื่อนไขเดียวกันกับการค้นหาเพื่อแสดงทุกอัน
+      _searchResults = IGDResults.where(
+          (result) => result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              )).toList();
+    });
+  }
+
   _getSavedToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString("token");
@@ -74,31 +137,35 @@ class _AddState extends State<AddPage> {
     return SafeArea(
         child: Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          const SizedBox(height: 50),
-          // MyTextField2(
-          //     controller: postnameController,
-          //     hintText: 'name',
-          //     obscureText: false),
-          // const SizedBox(height: 20),
-          // MyTextField2(
-          //     controller: DescriptController,
-          //     hintText: 'Solution',
-          //     obscureText: false),
-          // const SizedBox(height: 20),
-          PostWidget(),
-          TextButton(onPressed: chooseImage, child: Text('choose your image')),
+      backgroundColor: const Color.fromARGB(255, 245, 238, 255),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            // MyTextField2(
+            //     controller: postnameController,
+            //     hintText: 'name',
+            //     obscureText: false),
+            // const SizedBox(height: 20),
+            // MyTextField2(
+            //     controller: DescriptController,
+            //     hintText: 'Solution',
+            //     obscureText: false),
+            // const SizedBox(height: 20),
+            PostWidget(),
 
-          SubmitButton(
-            onPressed: () //=> postController.postMenuUser(),
-                {
-              _getSavedToken();
-            },
-            title: 'SUBMIT',
-          ),
-        ],
+            //_buildSearchResults(),
+            // TextButton(onPressed: chooseImage, child: Text('choose your image')),
+
+            // SubmitButton(
+            //   onPressed: () //=> postController.postMenuUser(),
+            //       {
+            //     _getSavedToken();
+            //   },
+            //   title: 'SUBMIT',
+            // ),
+          ],
+        ),
       ),
     ));
   }
@@ -110,16 +177,127 @@ class _AddState extends State<AddPage> {
         SizedBox(
           height: 20,
         ),
-        InputTextFieldMultipleWidget(
-          postController.descriptionController,
-          'Description',
+        Text('Ingredients'),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color.fromARGB(255, 255, 255, 255),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.black,
+              ),
+              hintText: 'Enter a search term',
+              contentPadding: EdgeInsets.only(
+                left: 15.0,
+              ),
+            ),
+            onChanged: (query) {
+              setState(() {
+                _searchResults = IGDResults.where((result) => result
+                    .ingredientsName
+                    .toLowerCase()
+                    .contains(query.toLowerCase())).toList();
+              });
+            },
+            controller: _searchController,
+            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+          ),
+        ),
+        Container(
+          height: 35, // กำหนดความสูงของ ListView
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _searchResults.length +
+                1, // เพิ่ม 1 เพื่อให้มีปุ่ม "Refresh" ด้วย
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                // ใส่ปุ่ม "Refresh" ที่ index 0
+                return IconButton(
+                    onPressed: () {
+                      _refreshChoiceChips();
+                    },
+                    icon: Icon(Icons.refresh));
+              } else {
+                final result = _searchResults[index - 1];
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 18.0),
+                    ChoiceChip(
+                      backgroundColor: Color.fromARGB(255, 230, 210, 255),
+                      key: ValueKey(result),
+                      label: Text(
+                        result.ingredientsName,
+                        style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                      selected: _selectedIngredients.contains(result),
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedIngredients.add(result);
+                          } else {
+                            _onIngredientRemoved(result);
+                          }
+                          _searchResults = IGDResults.where((result) =>
+                              result.ingredientsName.toLowerCase().contains(
+                                    _searchController.text.toLowerCase(),
+                                  ) &&
+                              !_selectedIngredients.contains(result)).toList();
+                        });
+                      },
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+        ),
+        SingleChildScrollView(
+          child: Container(
+            height:
+                _selectedIngredients.length * 50.0, // กำหนดความสูงของ ListView
+            child: ListView.builder(
+              controller: postController.IGDController,
+              scrollDirection: Axis.vertical, // กำหนดเรียงแนวนอน
+              itemCount: _selectedIngredients.length,
+              itemBuilder: (context, index) {
+                final selectedIngredient =
+                    _selectedIngredients.elementAt(index);
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(width: 18.0),
+                    Chip(
+                      label: Text(selectedIngredient.ingredientsName),
+                      backgroundColor: Colors.white,
+                      onDeleted: () {
+                        setState(() {
+                          _selectedIngredients.remove(selectedIngredient);
+                        });
+                      },
+                    ),
+                    Text('   ' +
+                        selectedIngredient.ingredientsUnits.toString() +
+                        ' กรัม   '),
+                    Text(selectedIngredient.ingredientsCal.toString() +
+                        ' แคลลอรี่')
+                  ],
+                );
+              },
+            ),
+          ),
         ),
         SizedBox(
           height: 20,
         ),
-        InputTextFieldWidget(
-          postController.typeController,
-          'Types',
+        InputTextFieldMultipleWidget(
+          postController.descriptionController,
+          'Description',
         ),
         SizedBox(
           height: 20,

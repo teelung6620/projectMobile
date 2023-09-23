@@ -16,6 +16,9 @@ class PostController extends GetxController {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController typeController = TextEditingController();
   TextEditingController idController = TextEditingController();
+  TextEditingController imageController = TextEditingController();
+  TextEditingController postidController = TextEditingController();
+  ScrollController IGDController = ScrollController();
 
   late String user_id;
 
@@ -25,9 +28,12 @@ class PostController extends GetxController {
       var url =
           Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.postMenu);
       Map body = {
-        'post_name': nameController.text,
-        'post_description': descriptionController.text.trim(),
-        'post_types': typeController.text,
+        'post_name': nameController.text.trim(),
+        'post_description': descriptionController.text,
+        'post_types': typeController.text
+            .trim(), //post_id, ingredients_id, ingredientsinuse_name
+        //'post_image':
+        'ingredients_id': IGDController
       };
 
       http.Response response =
@@ -43,6 +49,7 @@ class PostController extends GetxController {
           Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
 
           user_id = jwtDecodedToken['user_id'];
+          print(user_id);
 
           nameController.clear();
           descriptionController.clear();

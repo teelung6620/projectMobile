@@ -18,6 +18,7 @@ import 'package:http/http.dart' as http;
 
 import '../components/submitButton.dart';
 import '../controller/registeration_controller.dart';
+import 'dart:io';
 
 class AddPage extends StatefulWidget {
   AddPage({Key? key}) : super(key: key);
@@ -34,7 +35,9 @@ class _AddState extends State<AddPage> {
   //List<IngredientList> _selectedResults = [];
   //bool _isSelected = false;
   List<IngredientList> _selectedIngredients = [];
-  IngredientList? _selectedIngredient;
+
+  XFile? image;
+  final picker = ImagePicker();
 
   Future getIGD() async {
     var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
@@ -74,6 +77,9 @@ class _AddState extends State<AddPage> {
                 _searchController.text.toLowerCase(),
               ) &&
           !_selectedIngredients.contains(result)).toList();
+
+      // อัปเดตรายการ ingredientsIdList
+      postController.ingredientsIdList = _selectedIngredients;
     });
   }
 
@@ -87,7 +93,21 @@ class _AddState extends State<AddPage> {
           (result) => result.ingredientsName.toLowerCase().contains(
                 _searchController.text.toLowerCase(),
               )).toList();
+
+      // อัปเดตรายการ ingredientsIdList
+      postController.ingredientsIdList = _selectedIngredients;
     });
+  }
+
+  void submitPost() {
+    // ตั้งค่าข้อความใน IGDController ขึ้นอยู่กับส่วนประกอบที่เลือก
+    // คุณสามารถรวม ID ของส่วนประกอบที่เลือกเป็นสตริงที่คั่นด้วยจุลภาคเช่น 1,2,3
+    postController.IGDController.text = _selectedIngredients
+        .map((ingredient) => ingredient.ingredientsId.toString())
+        .join(',');
+
+    // เรียกใช้เมธอด postMenuUser เพื่อส่งข้อมูล
+    postController.postMenuUser(image!.path);
   }
 
   _getSavedToken() async {
@@ -100,8 +120,6 @@ class _AddState extends State<AddPage> {
     user_id = jwtDecodedToken['user_id'];
     print(user_id);
   }
-
-  final picker = ImagePicker();
 
   Future<void> chooseImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -152,18 +170,17 @@ class _AddState extends State<AddPage> {
             //     hintText: 'Solution',
             //     obscureText: false),
             // const SizedBox(height: 20),
+
             PostWidget(),
 
             //_buildSearchResults(),
-            // TextButton(onPressed: chooseImage, child: Text('choose your image')),
 
-            // SubmitButton(
-            //   onPressed: () //=> postController.postMenuUser(),
-            //       {
-            //     _getSavedToken();
-            //   },
-            //   title: 'SUBMIT',
-            // ),
+            SubmitButton(
+              onPressed: () {
+                submitPost(); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
+              },
+              title: 'ส่งข้อมูล',
+            ),
           ],
         ),
       ),
@@ -173,6 +190,33 @@ class _AddState extends State<AddPage> {
   Widget PostWidget() {
     return Column(
       children: [
+        TextButton(
+          onPressed: () async {
+            final pickedFile =
+                await picker.pickImage(source: ImageSource.gallery);
+            if (pickedFile != null) {
+              setState(() {
+                image = pickedFile;
+              });
+              // ทำอะไรกับ imagePath ต่อไป
+            }
+          },
+          child: Text('choose image'),
+        ),
+        CircleAvatar(
+          radius: 20,
+          child: image != null
+              ? Image.file(
+                  File(image!.path),
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover, // ปรับขนาดรูปภาพให้พอดีกับตัว widget
+                )
+              : null,
+        ),
+        SizedBox(
+          height: 20,
+        ),
         InputTextFieldWidget(postController.nameController, 'Name'),
         SizedBox(
           height: 20,
@@ -262,7 +306,6 @@ class _AddState extends State<AddPage> {
             height:
                 _selectedIngredients.length * 50.0, // กำหนดความสูงของ ListView
             child: ListView.builder(
-              controller: postController.IGDController,
               scrollDirection: Axis.vertical, // กำหนดเรียงแนวนอน
               itemCount: _selectedIngredients.length,
               itemBuilder: (context, index) {
@@ -294,6 +337,10 @@ class _AddState extends State<AddPage> {
         ),
         SizedBox(
           height: 20,
+        ),
+        InputTextFieldWidget(
+          postController.typeController,
+          'TYPES',
         ),
         InputTextFieldMultipleWidget(
           postController.descriptionController,

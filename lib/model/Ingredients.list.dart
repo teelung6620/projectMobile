@@ -15,21 +15,23 @@ class IngredientList {
   int ingredientsId;
   String ingredientsName;
   int ingredientsUnits;
+  IngredientsUnitsName ingredientsUnitsName;
   int ingredientsCal;
-  bool isSelected;
 
   IngredientList({
     required this.ingredientsId,
     required this.ingredientsName,
     required this.ingredientsUnits,
+    required this.ingredientsUnitsName,
     required this.ingredientsCal,
-    this.isSelected = false,
   });
 
   factory IngredientList.fromJson(Map<String, dynamic> json) => IngredientList(
         ingredientsId: json["ingredients_id"],
         ingredientsName: json["ingredients_name"],
         ingredientsUnits: json["ingredients_units"],
+        ingredientsUnitsName:
+            ingredientsUnitsNameValues.map[json["ingredients_unitsName"]]!,
         ingredientsCal: json["ingredients_cal"],
       );
 
@@ -37,6 +39,27 @@ class IngredientList {
         "ingredients_id": ingredientsId,
         "ingredients_name": ingredientsName,
         "ingredients_units": ingredientsUnits,
+        "ingredients_unitsName":
+            ingredientsUnitsNameValues.reverse[ingredientsUnitsName],
         "ingredients_cal": ingredientsCal,
       };
+}
+
+enum IngredientsUnitsName { EMPTY, INGREDIENTS_UNITS_NAME }
+
+final ingredientsUnitsNameValues = EnumValues({
+  "กรัม": IngredientsUnitsName.EMPTY,
+  "ฟอง": IngredientsUnitsName.INGREDIENTS_UNITS_NAME
+});
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
+  }
 }

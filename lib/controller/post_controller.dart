@@ -1,7 +1,8 @@
 import 'dart:convert';
-
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/pages/home.dart';
 import 'package:project_mobile/pages/homeTest.dart';
@@ -9,6 +10,7 @@ import 'package:project_mobile/pages/login_page2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../model/Ingredients.list.dart';
 import '../utils/api_endpoint.dart';
 
 class PostController extends GetxController {
@@ -18,33 +20,51 @@ class PostController extends GetxController {
   TextEditingController idController = TextEditingController();
   TextEditingController imageController = TextEditingController();
   TextEditingController postidController = TextEditingController();
-  ScrollController IGDController = ScrollController();
+  TextEditingController IGDController = TextEditingController();
+  List<IngredientList> ingredientsIdList = [];
 
   late String user_id;
 
-  Future<void> postMenuUser() async {
+  Future<void> postMenuUser(String imagePath) async {
     try {
       var headers = {'Content-Type': 'application/json'};
-      var url =
-          Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.postMenu);
-      Map body = {
-        'post_name': nameController.text.trim(),
-        'post_description': descriptionController.text,
-        'post_types': typeController.text
-            .trim(), //post_id, ingredients_id, ingredientsinuse_name
-        //'post_image':
-        'ingredients_id': IGDController
-      };
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.postMenu),
+      );
 
-      http.Response response =
-          await http.post(url, body: jsonEncode(body), headers: headers);
+      // เพิ่มไฟล์รูปภาพลงในคำขอ
+      request.files.add(await http.MultipartFile.fromPath(
+        'post_image',
+        imagePath,
+        contentType: MediaType(
+          'image',
+          'jpeg/png/jpg', // หรือ 'png' หรือประเภทรูปภาพอื่น ๆ ตามที่เหมาะสม
+        ),
+      ));
+
+      // เพิ่มข้อมูลอื่น ๆ ลงในคำขอ
+      request.fields['post_name'] = nameController.text.trim();
+      request.fields['post_description'] = descriptionController.text;
+      request.fields['post_types'] = typeController.text.trim();
+      request.fields['ingredients_id'] = IGDController
+          .text; // ถ้า IGDController มีข้อมูลเกี่ยวกับ ingredients_id
+
+      // รวมรหัสของส่วนประกอบที่ถูกเลือกและคั่นด้วยเครื่องหมายจุลภาค
+
+      // ส่งคำขอ
+      final response = await request.send();
 
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
+        final responseData = await response.stream.bytesToString();
+        final json = jsonDecode(responseData);
+        int? postID = json['insertId'];
+
         if (json['status'] == 'ok') {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           String? token = prefs.getString("token");
           print(token);
+          print('post_id: $postID');
 
           Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
 
@@ -63,14 +83,15 @@ class PostController extends GetxController {
     } catch (e) {
       Get.back();
       showDialog(
-          context: Get.context!,
-          builder: (context) {
-            return SimpleDialog(
-              title: Text('Error'),
-              contentPadding: EdgeInsets.all(20),
-              children: [Text(e.toString())],
-            );
-          });
+        context: Get.context!,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('เกิดข้อผิดพลาด'),
+            contentPadding: EdgeInsets.all(20),
+            children: [Text(e.toString())],
+          );
+        },
+      );
     }
   }
 }

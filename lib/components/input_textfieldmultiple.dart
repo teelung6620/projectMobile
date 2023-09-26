@@ -22,7 +22,7 @@ class InputTextFieldMultipleWidget extends StatelessWidget {
             fillColor: Colors.white54,
             hintText: hintText,
             hintStyle: TextStyle(color: Color.fromARGB(255, 180, 143, 209)),
-            contentPadding: EdgeInsets.symmetric(vertical: 200),
+            contentPadding: EdgeInsets.symmetric(vertical: 20),
             focusColor: Colors.white60,
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(10))),

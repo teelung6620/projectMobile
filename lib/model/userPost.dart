@@ -24,7 +24,6 @@ class UserPost {
   String userPassword;
   int ingredientsinuseId;
   int ingredientsId;
-  String ingredientsinuseName;
   String ingredientsName;
   int ingredientsUnits;
   int ingredientsCal;
@@ -51,7 +50,6 @@ class UserPost {
     required this.userPassword,
     required this.ingredientsinuseId,
     required this.ingredientsId,
-    required this.ingredientsinuseName,
     required this.ingredientsName,
     required this.ingredientsUnits,
     required this.ingredientsCal,
@@ -78,7 +76,6 @@ class UserPost {
         userPassword: json["user_password"],
         ingredientsinuseId: json["ingredientsinuse_id"],
         ingredientsId: json["ingredients_id"],
-        ingredientsinuseName: json["ingredientsinuse_name"],
         ingredientsName: json["ingredients_name"],
         ingredientsUnits: json["ingredients_units"],
         ingredientsCal: json["ingredients_cal"],
@@ -103,7 +100,6 @@ class UserPost {
         "user_password": userPassword,
         "ingredientsinuse_id": ingredientsinuseId,
         "ingredients_id": ingredientsId,
-        "ingredientsinuse_name": ingredientsinuseName,
         "ingredients_name": ingredientsName,
         "ingredients_units": ingredientsUnits,
         "ingredients_cal": ingredientsCal,

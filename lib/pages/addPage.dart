@@ -35,6 +35,7 @@ class _AddState extends State<AddPage> {
   //List<IngredientList> _selectedResults = [];
   //bool _isSelected = false;
   List<IngredientList> _selectedIngredients = [];
+  List<int> _selectedUnits = [];
 
   XFile? image;
   final picker = ImagePicker();
@@ -107,7 +108,7 @@ class _AddState extends State<AddPage> {
         .join(',');
 
     // เรียกใช้เมธอด postMenuUser เพื่อส่งข้อมูล
-    postController.postMenuUser(image!.path);
+    postController.postMenuUser(image!.path, _selectedUnits);
   }
 
   _getSavedToken() async {
@@ -179,7 +180,7 @@ class _AddState extends State<AddPage> {
               onPressed: () {
                 submitPost(); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
               },
-              title: 'ส่งข้อมูล',
+              title: 'CREATE',
             ),
           ],
         ),
@@ -284,6 +285,9 @@ class _AddState extends State<AddPage> {
                         setState(() {
                           if (selected) {
                             _selectedIngredients.add(result);
+                            _selectedUnits.add(result.ingredientsUnits);
+                            print(result.ingredientsUnits);
+                            print(result.ingredientsName);
                           } else {
                             _onIngredientRemoved(result);
                           }
@@ -321,14 +325,21 @@ class _AddState extends State<AddPage> {
                       onDeleted: () {
                         setState(() {
                           _selectedIngredients.remove(selectedIngredient);
+                          _selectedUnits.removeAt(index);
                         });
                       },
                     ),
-                    Text('   ' +
+                    Text('  ' +
                         selectedIngredient.ingredientsUnits.toString() +
-                        ' กรัม   '),
-                    Text(selectedIngredient.ingredientsCal.toString() +
-                        ' แคลลอรี่')
+                        '  '),
+                    Text(ingredientsUnitsNameValues
+                            .reverse[selectedIngredient.ingredientsUnitsName] ??
+                        '' +
+                            ' ' +
+                            selectedIngredient.ingredientsUnits.toString()),
+                    Text('  ' +
+                        selectedIngredient.ingredientsCal.toString() +
+                        ' แคลอรี่')
                   ],
                 );
               },

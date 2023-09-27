@@ -45,11 +45,13 @@ class IngredientList {
       };
 }
 
-enum IngredientsUnitsName { EMPTY, INGREDIENTS_UNITS_NAME }
+enum IngredientsUnitsName { EMPTY, FLUFFY, INGREDIENTS_UNITS_NAME, PURPLE }
 
 final ingredientsUnitsNameValues = EnumValues({
   "กรัม": IngredientsUnitsName.EMPTY,
-  "ฟอง": IngredientsUnitsName.INGREDIENTS_UNITS_NAME
+  "ถ้วย": IngredientsUnitsName.FLUFFY,
+  "ฟอง": IngredientsUnitsName.INGREDIENTS_UNITS_NAME,
+  "ช้อนชา": IngredientsUnitsName.PURPLE
 });
 
 class EnumValues<T> {

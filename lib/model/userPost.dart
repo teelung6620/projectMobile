@@ -16,25 +16,10 @@ class UserPost {
   String postName;
   String postDescription;
   String postTypes;
+  List<IngredientsId> ingredientsId;
   String postImage;
   DateTime postTime;
   String userName;
-  String userImage;
-  String userEmail;
-  String userPassword;
-  int ingredientsinuseId;
-  int ingredientsId;
-  String ingredientsName;
-  int ingredientsUnits;
-  int ingredientsCal;
-  String iDingred;
-  String ningred;
-  List<String> separatedNingred;
-  String uingred;
-  List<String> separatedUingred;
-  String cingred;
-  List<String> separatedCingred;
-  String cingredAll;
 
   UserPost({
     required this.postId,
@@ -42,25 +27,11 @@ class UserPost {
     required this.postName,
     required this.postDescription,
     required this.postTypes,
+    required this.ingredientsId,
     required this.postImage,
     required this.postTime,
     required this.userName,
-    required this.userImage,
-    required this.userEmail,
-    required this.userPassword,
-    required this.ingredientsinuseId,
-    required this.ingredientsId,
-    required this.ingredientsName,
-    required this.ingredientsUnits,
-    required this.ingredientsCal,
-    required this.iDingred,
-    required this.ningred,
-    required this.uingred,
-    required this.cingred,
-    required this.cingredAll,
-  })  : separatedNingred = ningred.split(','),
-        separatedUingred = uingred.split(','),
-        separatedCingred = cingred.split(',');
+  });
 
   factory UserPost.fromJson(Map<String, dynamic> json) => UserPost(
         postId: json["post_id"],
@@ -68,22 +39,11 @@ class UserPost {
         postName: json["post_name"],
         postDescription: json["post_description"],
         postTypes: json["post_types"],
+        ingredientsId: List<IngredientsId>.from(
+            json["ingredients_id"].map((x) => IngredientsId.fromJson(x))),
         postImage: json["post_image"],
         postTime: DateTime.parse(json["post_time"]),
         userName: json["user_name"],
-        userImage: json["user_image"],
-        userEmail: json["user_email"],
-        userPassword: json["user_password"],
-        ingredientsinuseId: json["ingredientsinuse_id"],
-        ingredientsId: json["ingredients_id"],
-        ingredientsName: json["ingredients_name"],
-        ingredientsUnits: json["ingredients_units"],
-        ingredientsCal: json["ingredients_cal"],
-        iDingred: json["IDingred"],
-        ningred: json["Ningred"],
-        uingred: json["Uingred"],
-        cingred: json["Cingred"],
-        cingredAll: json["CingredALL"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -92,21 +52,38 @@ class UserPost {
         "post_name": postName,
         "post_description": postDescription,
         "post_types": postTypes,
+        "ingredients_id":
+            List<dynamic>.from(ingredientsId.map((x) => x.toJson())),
         "post_image": postImage,
         "post_time": postTime.toIso8601String(),
         "user_name": userName,
-        "user_image": userImage,
-        "user_email": userEmail,
-        "user_password": userPassword,
-        "ingredientsinuse_id": ingredientsinuseId,
-        "ingredients_id": ingredientsId,
+      };
+}
+
+class IngredientsId {
+  String ingredientsName;
+  int ingredientsUnits;
+  int ingredientsCal;
+  String ingredientsUnitsName;
+
+  IngredientsId({
+    required this.ingredientsName,
+    required this.ingredientsUnits,
+    required this.ingredientsCal,
+    required this.ingredientsUnitsName,
+  });
+
+  factory IngredientsId.fromJson(Map<String, dynamic> json) => IngredientsId(
+        ingredientsName: json["ingredients_name"],
+        ingredientsUnits: json["ingredients_units"],
+        ingredientsCal: json["ingredients_cal"],
+        ingredientsUnitsName: json["ingredients_unitsName"],
+      );
+
+  Map<String, dynamic> toJson() => {
         "ingredients_name": ingredientsName,
         "ingredients_units": ingredientsUnits,
         "ingredients_cal": ingredientsCal,
-        "IDingred": iDingred,
-        "Ningred": ningred,
-        "Uingred": uingred,
-        "Cingred": cingred,
-        "CingredALL": cingredAll,
+        "ingredients_unitsName": ingredientsUnitsName,
       };
 }

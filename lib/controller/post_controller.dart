@@ -25,8 +25,15 @@ class PostController extends GetxController {
 
   late String user_id;
 
-  Future<void> postMenuUser(String imagePath) async {
+  Future<void> postMenuUser(String imagePath, List<int> _selectedUnits) async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+      print(token);
+
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      user_id = jwtDecodedToken['user_id'].toString();
+
       var headers = {'Content-Type': 'application/json'};
       var request = http.MultipartRequest(
         'POST',
@@ -49,8 +56,9 @@ class PostController extends GetxController {
       request.fields['post_types'] = typeController.text.trim();
       request.fields['ingredients_id'] = IGDController
           .text; // ถ้า IGDController มีข้อมูลเกี่ยวกับ ingredients_id
-
-      // รวมรหัสของส่วนประกอบที่ถูกเลือกและคั่นด้วยเครื่องหมายจุลภาค
+      request.fields['user_id'] =
+          user_id; // เพิ่ม user_id ที่ดึงมาจาก SharedPreferences
+      request.fields['ingredients_unit'] = _selectedUnits.toString();
 
       // ส่งคำขอ
       final response = await request.send();
@@ -58,19 +66,8 @@ class PostController extends GetxController {
       if (response.statusCode == 200) {
         final responseData = await response.stream.bytesToString();
         final json = jsonDecode(responseData);
-        int? postID = json['insertId'];
 
         if (json['status'] == 'ok') {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          String? token = prefs.getString("token");
-          print(token);
-          print('post_id: $postID');
-
-          Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
-
-          user_id = jwtDecodedToken['user_id'];
-          print(user_id);
-
           nameController.clear();
           descriptionController.clear();
           typeController.clear();

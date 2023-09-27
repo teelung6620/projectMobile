@@ -52,7 +52,7 @@ class PostController extends GetxController {
 
       // เพิ่มข้อมูลอื่น ๆ ลงในคำขอ
       request.fields['post_name'] = nameController.text.trim();
-      request.fields['post_description'] = descriptionController.text;
+      request.fields['post_description'] = descriptionController.text.trim();
       request.fields['post_types'] = typeController.text.trim();
       request.fields['ingredients_id'] = IGDController
           .text; // ถ้า IGDController มีข้อมูลเกี่ยวกับ ingredients_id

@@ -10,6 +10,7 @@ class InputTextFieldWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 46,
+      width: 380,
       child: TextField(
         controller: textEditingController,
         decoration: InputDecoration(

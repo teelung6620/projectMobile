@@ -9,7 +9,8 @@ class InputTextFieldMultipleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 400,
+      width: 380,
       child: TextField(
         keyboardType: TextInputType.multiline,
         minLines: 1,

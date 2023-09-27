@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
+import 'package:project_mobile/model/userPost.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
@@ -36,6 +37,9 @@ class _AddState extends State<AddPage> {
   //bool _isSelected = false;
   List<IngredientList> _selectedIngredients = [];
   List<int> _selectedUnits = [];
+  TextEditingController unitController = TextEditingController();
+  List<String> typeOptions = ['food', 'sweet', 'drink'];
+  String _selectedItem = 'food';
 
   XFile? image;
   final picker = ImagePicker();
@@ -202,18 +206,33 @@ class _AddState extends State<AddPage> {
               // ทำอะไรกับ imagePath ต่อไป
             }
           },
-          child: Text('choose image'),
-        ),
-        CircleAvatar(
-          radius: 20,
-          child: image != null
-              ? Image.file(
-                  File(image!.path),
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover, // ปรับขนาดรูปภาพให้พอดีกับตัว widget
-                )
-              : null,
+          child: Center(
+            child: Container(
+              width: 300, // กำหนดความกว้างของรูปภาพตามที่คุณต้องการ
+              height: 200, // กำหนดความสูงของรูปภาพตามที่คุณต้องการ
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(
+                    10), // กำหนดรูปร่างของ Container เป็นสี่เหลี่ยมมุมโค้ง
+                color: Colors.white, // กำหนดสีพื้นหลังของ Container
+              ),
+              child: image != null
+                  ? Image.file(
+                      File(image!.path),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    )
+                  : Align(
+                      alignment: Alignment.center, // จัดให้ Text อยู่ตรงกลาง
+                      child: Text(
+                        'Choose Image',
+                        style: TextStyle(
+                            fontSize:
+                                10), // ปรับแต่งขนาดตัวอักษรตามที่คุณต้องการ
+                      ),
+                    ),
+            ),
+          ),
         ),
         SizedBox(
           height: 20,
@@ -282,23 +301,71 @@ class _AddState extends State<AddPage> {
                       ),
                       selected: _selectedIngredients.contains(result),
                       onSelected: (selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedIngredients.add(result);
-                            _selectedUnits.add(result.ingredientsUnits);
-                            print(result.ingredientsUnits);
-                            print(result.ingredientsName);
-                          } else {
-                            _onIngredientRemoved(result);
-                          }
-                          _searchResults = IGDResults.where((result) =>
-                              result.ingredientsName.toLowerCase().contains(
-                                    _searchController.text.toLowerCase(),
-                                  ) &&
-                              !_selectedIngredients.contains(result)).toList();
-                        });
+                        if (selected) {
+                          // เรียกใช้ showDialog และกำหนดค่าเริ่มต้นของ TextField
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              unitController.text = result.ingredientsUnits
+                                  .toString(); // กำหนดค่าเริ่มต้นให้กับ TextField
+                              return AlertDialog(
+                                title: Text(result.ingredientsName),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: TextField(
+                                            controller: unitController,
+                                            keyboardType: TextInputType.number,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          ingredientsUnitsNameValues.reverse[
+                                                  result
+                                                      .ingredientsUnitsName] ??
+                                              '' +
+                                                  ' ' +
+                                                  result.ingredientsUnits
+                                                      .toString(),
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                actions: <Widget>[
+                                  ElevatedButton(
+                                    child: Text("Add"),
+                                    onPressed: () {
+                                      int units =
+                                          int.tryParse(unitController.text) ??
+                                              0;
+                                      if (units > 0) {
+                                        setState(() {
+                                          _selectedIngredients.add(result);
+                                          _selectedUnits.add(units);
+                                        });
+                                      }
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        } else {
+                          _onIngredientRemoved(result);
+                        }
                       },
-                    ),
+                    )
                   ],
                 );
               }
@@ -329,6 +396,11 @@ class _AddState extends State<AddPage> {
                         });
                       },
                     ),
+                    Text(
+                      '  ' + unitController.text + '  ',
+                      style: TextStyle(
+                          fontSize: 16.0), // ปรับแต่งสไตล์ตามที่คุณต้องการ
+                    ),
                     Text('  ' +
                         selectedIngredient.ingredientsUnits.toString() +
                         '  '),
@@ -349,16 +421,38 @@ class _AddState extends State<AddPage> {
         SizedBox(
           height: 20,
         ),
-        InputTextFieldWidget(
-          postController.typeController,
-          'TYPES',
+        Container(
+          decoration: BoxDecoration(
+              color: Color.fromARGB(255, 227, 150, 255),
+              borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: DropdownButton(
+              value: _selectedItem,
+              dropdownColor: Colors.orange,
+              style: TextStyle(color: Colors.white, fontSize: 20),
+              iconEnabledColor: Colors.white,
+              items: typeOptions.map((String option) {
+                return DropdownMenuItem<String>(
+                  value: option,
+                  child: Text(option),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  postController.typeController.text = newValue ?? '';
+                  _selectedItem = newValue ?? '';
+                });
+              },
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 20,
         ),
         InputTextFieldMultipleWidget(
           postController.descriptionController,
           'Description',
-        ),
-        SizedBox(
-          height: 20,
         ),
       ],
     );

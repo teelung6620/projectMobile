@@ -194,6 +194,7 @@ class _AddState extends State<AddPage> {
 
   Widget PostWidget() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextButton(
           onPressed: () async {
@@ -225,10 +226,11 @@ class _AddState extends State<AddPage> {
                   : Align(
                       alignment: Alignment.center, // จัดให้ Text อยู่ตรงกลาง
                       child: Text(
-                        'Choose Image',
+                        'เลือกรูปภาพของคุณ',
                         style: TextStyle(
-                            fontSize:
-                                10), // ปรับแต่งขนาดตัวอักษรตามที่คุณต้องการ
+                            fontSize: 20,
+                            color: Color.fromARGB(255, 114, 26,
+                                236)), // ปรับแต่งขนาดตัวอักษรตามที่คุณต้องการ
                       ),
                     ),
             ),
@@ -237,11 +239,16 @@ class _AddState extends State<AddPage> {
         SizedBox(
           height: 20,
         ),
-        InputTextFieldWidget(postController.nameController, 'Name'),
+        Center(
+            child: InputTextFieldWidget(postController.nameController, 'Name')),
         SizedBox(
           height: 20,
         ),
-        Text('Ingredients'),
+        Text(
+          '   ส่วนผสม',
+          textAlign: TextAlign.left,
+          style: TextStyle(fontSize: 20),
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
@@ -253,9 +260,9 @@ class _AddState extends State<AddPage> {
               ),
               prefixIcon: Icon(
                 Icons.search,
-                color: Colors.black,
+                color: Color.fromARGB(255, 147, 91, 251),
               ),
-              hintText: 'Enter a search term',
+              hintText: 'ค้นหาส่วนผสมที่ต้องการ',
               contentPadding: EdgeInsets.only(
                 left: 15.0,
               ),
@@ -372,80 +379,156 @@ class _AddState extends State<AddPage> {
             },
           ),
         ),
-        SingleChildScrollView(
-          child: Container(
-            height:
-                _selectedIngredients.length * 50.0, // กำหนดความสูงของ ListView
-            child: ListView.builder(
-              scrollDirection: Axis.vertical, // กำหนดเรียงแนวนอน
-              itemCount: _selectedIngredients.length,
-              itemBuilder: (context, index) {
-                final selectedIngredient =
-                    _selectedIngredients.elementAt(index);
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(width: 18.0),
-                    Chip(
-                      label: Text(selectedIngredient.ingredientsName),
-                      backgroundColor: Colors.white,
-                      onDeleted: () {
-                        setState(() {
-                          _selectedIngredients.remove(selectedIngredient);
-                          _selectedUnits.removeAt(index);
-                        });
-                      },
-                    ),
-                    Text(
-                      '  ' + unitController.text + '  ',
-                      style: TextStyle(
-                          fontSize: 16.0), // ปรับแต่งสไตล์ตามที่คุณต้องการ
-                    ),
-                    Text('  ' +
-                        selectedIngredient.ingredientsUnits.toString() +
-                        '  '),
-                    Text(ingredientsUnitsNameValues
-                            .reverse[selectedIngredient.ingredientsUnitsName] ??
-                        '' +
-                            ' ' +
-                            selectedIngredient.ingredientsUnits.toString()),
-                    Text('  ' +
-                        selectedIngredient.ingredientsCal.toString() +
-                        ' แคลอรี่')
-                  ],
-                );
-              },
+        Visibility(
+          visible: _selectedIngredients.isNotEmpty, // ตรวจสอบว่ามีรายการหรือไม่
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.all(
+                  5), // ปรับ padding เพื่อลดขนาดของ Container ภายใน
+              margin: EdgeInsets.all(
+                  5), // ปรับ margin เพื่อลดขนาดของ Container ภายใน
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: Color.fromARGB(255, 130, 80, 184),
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: _selectedIngredients.map((selectedIngredient) {
+                  final index =
+                      _selectedIngredients.indexOf(selectedIngredient);
+                  return Row(
+                    // จัดให้รายการแสดงต่อกันโดยไม่มีช่องว่าง
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.25, // กำหนดความกว้างของคอลัมน์ 2
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Chip(
+                              label: Text(selectedIngredient.ingredientsName),
+                              backgroundColor: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.25, // กำหนดความกว้างของคอลัมน์ 3
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  unitController.text + '  ',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                                Text(
+                                  ingredientsUnitsNameValues.reverse[
+                                          selectedIngredient
+                                              .ingredientsUnitsName] ??
+                                      '' +
+                                          ' ' +
+                                          selectedIngredient.ingredientsUnits
+                                              .toString(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.25, // กำหนดความกว้างของคอลัมน์ 4
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  '  ' +
+                                      (int.parse(unitController.text) *
+                                              selectedIngredient
+                                                  .ingredientsCal ~/
+                                              selectedIngredient
+                                                  .ingredientsUnits)
+                                          .toString() +
+                                      ' แคลอรี่',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.18, // กำหนดความกว้างของคอลัมน์ 1
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                  Icons.cancel), // อัพเดทไอคอนตามที่คุณต้องการ
+                              onPressed: () {
+                                setState(() {
+                                  _selectedIngredients
+                                      .remove(selectedIngredient);
+                                  _selectedUnits.removeAt(index);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ),
         SizedBox(
           height: 20,
         ),
-        Container(
-          decoration: BoxDecoration(
-              color: Color.fromARGB(255, 227, 150, 255),
-              borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: DropdownButton(
-              value: _selectedItem,
-              dropdownColor: Colors.orange,
-              style: TextStyle(color: Colors.white, fontSize: 20),
-              iconEnabledColor: Colors.white,
-              items: typeOptions.map((String option) {
-                return DropdownMenuItem<String>(
-                  value: option,
-                  child: Text(option),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  postController.typeController.text = newValue ?? '';
-                  _selectedItem = newValue ?? '';
-                });
-              },
+        Row(
+          children: [
+            Text(
+              '  ประเภทของอาหาร : ',
+              textAlign: TextAlign.left,
+              style: TextStyle(fontSize: 17),
             ),
-          ),
+            Container(
+              height: 25,
+              decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 206, 167, 255),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: DropdownButton(
+                    value: _selectedItem,
+                    dropdownColor: Color.fromARGB(255, 206, 167, 255),
+                    style: TextStyle(color: Colors.white, fontSize: 15),
+                    iconEnabledColor: Colors.white,
+                    items: typeOptions.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedItem = newValue ?? '';
+                        postController.typeController.text = _selectedItem;
+                      });
+                    },
+                  )),
+            ),
+          ],
         ),
         SizedBox(
           height: 20,

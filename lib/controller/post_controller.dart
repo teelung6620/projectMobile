@@ -67,15 +67,13 @@ class PostController extends GetxController {
         final responseData = await response.stream.bytesToString();
         final json = jsonDecode(responseData);
 
-        if (json['status'] == 'ok') {
-          nameController.clear();
-          descriptionController.clear();
-          typeController.clear();
+        nameController.clear();
+        descriptionController.clear();
+        typeController.clear();
 
-          Get.off(HomePage(
-            token: token,
-          ));
-        }
+        Get.off(HomePage(
+          token: token,
+        ));
       }
     } catch (e) {
       Get.back();

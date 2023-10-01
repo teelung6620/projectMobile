@@ -2,23 +2,32 @@ import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_mobile/controller/comments_controller.dart';
 import 'package:project_mobile/model/Comments.list.dart';
 import 'package:project_mobile/model/userPost.dart';
+import '../components/input_textfield.dart';
 import '../components/my_textfield2.dart';
+import '../components/submitButton.dart';
 import '../model/userPost.dart';
 import 'package:flutter/src/rendering/box.dart';
 import '../model/teamTest.dart';
 
 class DetailPage extends StatefulWidget {
   final UserPost userP;
-  const DetailPage({Key? key, required this.userP}) : super(key: key);
+  final int post_id; // Add this line to accept post_id
+  const DetailPage({Key? key, required this.userP, required this.post_id})
+      : super(key: key);
+
   @override
   State<DetailPage> createState() => _DetailState();
 }
 
 class _DetailState extends State<DetailPage> {
   List<CommentsList> comment = [];
+  CommentsController commentsController = Get.put(CommentsController());
 
   Future<void> fetchComments() async {
     var url = Uri.parse("http://10.0.2.2:4000/comments");
@@ -187,6 +196,19 @@ class _DetailState extends State<DetailPage> {
               '   Comments',
               textAlign: TextAlign.left,
               style: TextStyle(fontSize: 20),
+            ),
+
+            Center(
+                child: InputTextFieldWidget(
+                    commentsController.commentlineController,
+                    'you can comment this post')),
+
+            SubmitButton(
+              onPressed: () {
+                commentsController.commentsUser(widget
+                    .userP.postId); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
+              },
+              title: 'Comment',
             ),
 
             Container(

@@ -7,4 +7,5 @@ class _AuthEndPoints {
   final String registerEmail = '/register';
   final String loginEmail = '/login';
   final String postMenu = '/post_data';
+  final String commentPost = '/comments';
 }

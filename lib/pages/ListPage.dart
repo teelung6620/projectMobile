@@ -263,9 +263,12 @@ class _ListState extends State<ListPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => DetailPage(
-                                      userP: posts[reverseindex],
-                                    )),
+                              builder: (context) => DetailPage(
+                                userP: posts[reverseindex],
+                                post_id: posts[reverseindex]
+                                    .postId, // Pass the post_id
+                              ),
+                            ),
                           );
                         },
                         // child: Row(

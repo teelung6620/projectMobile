@@ -32,8 +32,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       //home: const LoginPage(),
-      home: (JwtDecoder.isExpired(token) == false)
-          ? HomePage(token: token)
+      home: (token != null && JwtDecoder.isExpired(token!) == false)
+          ? HomePage(token: token!)
           : LoginScreen(),
     );
   }

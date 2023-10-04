@@ -240,85 +240,81 @@ class _ListState extends State<ListPage> {
             //   ],
             // ),
             Expanded(
-              child: ListView.builder(
-                itemCount: newPosts.length,
-                padding: EdgeInsets.all(8),
-                physics: BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  var reverseindex = newPosts.length - 1 - index;
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: 20,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 255, 255, 255),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailPage(
-                                userP: posts[reverseindex],
-                                post_id: posts[reverseindex]
-                                    .postId, // Pass the post_id
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await getPost(); // เรียกโค้ดการดึงข้อมูลเมื่อรีเฟรช
+                },
+                child: SingleChildScrollView(
+                  // physics: BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      ListView.builder(
+                        shrinkWrap:
+                            true, // สำคัญ: คำสั่งนี้ช่วยให้ ListView.builder สามารถทำงานร่วมกับ SingleChildScrollView ได้
+                        itemCount: newPosts.length,
+                        padding: EdgeInsets.all(8),
+                        physics:
+                            NeverScrollableScrollPhysics(), // ยกเลิกการเลื่อนเพิ่มเติมสำหรับ ListView นี้
+                        itemBuilder: (context, index) {
+                          var reverseindex = newPosts.length - 1 - index;
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 20,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailPage(
+                                        userP: posts[reverseindex],
+                                        post_id: posts[reverseindex].postId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Align(
+                                  child: ListTile(
+                                    subtitleTextStyle: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.normal),
+                                    titleTextStyle: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.normal),
+                                    leading: Image(
+                                      image: NetworkImage(
+                                        'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
+                                      ),
+                                    ),
+                                    title: Text(
+                                      newPosts[reverseindex].postName,
+                                      textAlign: TextAlign.right,
+                                    ),
+                                    subtitle: Text(
+                                      newPosts[reverseindex].userName,
+                                      textAlign: TextAlign.right,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           );
                         },
-                        // child: Row(
-                        //   children: [
-                        //     Image(
-                        //         image: NetworkImage(
-                        //       'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                        //     )),
-                        //     Text(
-                        //       newPosts[reverseindex].postName,
-                        //       style: TextStyle(color: Colors.black),
-                        //       textAlign: TextAlign.right,
-                        //     ),
-                        //     Text(
-                        //       newPosts[reverseindex].userName,
-                        //       style: TextStyle(color: Colors.black),
-                        //       textAlign: TextAlign.right,
-                        //     ),
-                        //   ],
-                        // ),
-                        child: Align(
-                          // alignment: FractionalOffset.bottomCenter,
-                          child: ListTile(
-                            subtitleTextStyle: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.normal),
-                            titleTextStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 25,
-                                fontWeight: FontWeight.normal),
-                            leading: Image(
-                              image: NetworkImage(
-                                'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                              ),
-                            ),
-                            title: Text(
-                              newPosts[reverseindex].postName,
-                              textAlign: TextAlign.right,
-                            ),
-                            subtitle: Text(
-                              newPosts[reverseindex].userName,
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                        ),
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                ),
               ),
-            ),
+            )
           ],
         ),
       ),

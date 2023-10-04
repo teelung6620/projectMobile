@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io'; // เพิ่ม import นี้
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart'; // เพิ่ม import นี้
 import 'package:project_mobile/pages/home.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
@@ -14,25 +17,34 @@ class RegisterationController extends GetxController {
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  File? userImage; // เพิ่มตัวแปร userImage
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
-  Future<void> registerWithEmail() async {
+  // ...
+
+  Future<void> registerWithEmail(String imagePath) async {
     try {
       var headers = {'Content-Type': 'application/json'};
       var url = Uri.parse(
           ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.registerEmail);
-      Map body = {
-        'user_name': nameController.text,
-        'user_email': emailController.text.trim(),
-        'user_password': passwordController.text
-      };
 
-      http.Response response =
-          await http.post(url, body: jsonEncode(body), headers: headers);
+      // เพิ่มรูปภาพไปยัง multipart request
+      var request = http.MultipartRequest('POST', url);
+      request.fields['user_name'] = nameController.text;
+      request.fields['user_email'] = emailController.text.trim();
+      request.fields['user_password'] = passwordController.text;
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'user_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
+        imagePath, // ไฟล์รูปภาพ
+        contentType: MediaType('image', 'jpeg/png/jpg'), // ประเภทของไฟล์รูปภาพ
+      ));
+
+      http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
+        final json = jsonDecode(await response.stream.bytesToString());
         if (json['status'] == 'ok') {
           nameController.clear();
           emailController.clear();
@@ -61,6 +73,16 @@ class RegisterationController extends GetxController {
               children: [Text(e.toString())],
             );
           });
+    }
+  }
+
+  // เพิ่มฟังก์ชันสำหรับการเลือกรูปภาพ
+  Future<void> pickUserImage() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      userImage = File(pickedFile.path);
+      update(); // อัพเดต UI
     }
   }
 }

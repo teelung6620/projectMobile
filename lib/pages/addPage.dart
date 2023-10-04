@@ -6,6 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
 import 'package:project_mobile/model/userPost.dart';
+import 'package:project_mobile/pages/ListPage.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
@@ -51,11 +52,10 @@ class _AddState extends State<AddPage> {
 
     setState(() {
       _searchResults = IGDResults.where((result) =>
-              result.ingredientsName.toLowerCase().contains(
-                    _searchController.text.toLowerCase(),
-                  ) &&
-              !_selectedIngredients.contains(result))
-          .toList(); // ตรวจสอบว่าไม่ถูกเลือกแล้วถึงเพิ่มลงใน _searchResults
+          result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              ) &&
+          !_selectedIngredients.contains(result)).toList();
     });
   }
 
@@ -90,10 +90,8 @@ class _AddState extends State<AddPage> {
 
   void _refreshChoiceChips() {
     setState(() {
-      // รีเฟรช ChoiceChips โดยลบทุก Ingredient ออกจาก _selectedIngredients
       _selectedIngredients.clear();
 
-      // รีเฟรชรายการที่แสดงใหม่โดยใช้เงื่อนไขเดียวกันกับการค้นหาเพื่อแสดงทุกอัน
       _searchResults = IGDResults.where(
           (result) => result.ingredientsName.toLowerCase().contains(
                 _searchController.text.toLowerCase(),
@@ -105,13 +103,41 @@ class _AddState extends State<AddPage> {
   }
 
   void submitPost() {
-    // ตั้งค่าข้อความใน IGDController ขึ้นอยู่กับส่วนประกอบที่เลือก
-    // คุณสามารถรวม ID ของส่วนประกอบที่เลือกเป็นสตริงที่คั่นด้วยจุลภาคเช่น 1,2,3
+    if (image == null ||
+        postController.nameController.text.isEmpty ||
+        _selectedIngredients.isEmpty ||
+        postController.descriptionController.text.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: Text('แจ้งเตือน'),
+            content: Text('กรุณากรอกข้อมูลให้ครบถ้วน'),
+            actions: <Widget>[
+              ElevatedButton(
+                child: Text(
+                  'OK',
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                      Color.fromARGB(255, 103, 23, 173)),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     postController.IGDController.text = _selectedIngredients
         .map((ingredient) => ingredient.ingredientsId.toString())
         .join(',');
 
-    // เรียกใช้เมธอด postMenuUser เพื่อส่งข้อมูล
     postController.postMenuUser(image!.path, _selectedUnits);
   }
 
@@ -135,25 +161,25 @@ class _AddState extends State<AddPage> {
     }
   }
 
-  Future<void> uploadImage(String imagePath) async {
-    final url = Uri.parse(
-        'localhost:4000/uploadPostImage'); // เปลี่ยนเป็น URL ของเซิร์ฟเวอร์ Node.js
+  // Future<void> uploadImage(String imagePath) async {
+  //   final url = Uri.parse(
+  //       'localhost:4000/uploadPostImage');
 
-    var request = http.MultipartRequest('PATCH', url);
-    request.files
-        .add(await http.MultipartFile.fromPath('post_image', imagePath));
+  //   var request = http.MultipartRequest('PATCH', url);
+  //   request.files
+  //       .add(await http.MultipartFile.fromPath('post_image', imagePath));
 
-    try {
-      final response = await request.send();
-      if (response.statusCode == 200) {
-        print('Upload success');
-      } else {
-        print('Upload failed with status ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Upload failed: $e');
-    }
-  }
+  //   try {
+  //     final response = await request.send();
+  //     if (response.statusCode == 200) {
+  //       print('Upload success');
+  //     } else {
+  //       print('Upload failed with status ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     print('Upload failed: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +208,7 @@ class _AddState extends State<AddPage> {
 
             SubmitButton(
               onPressed: () {
-                submitPost(); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
+                submitPost();
               },
               title: 'CREATE',
             ),
@@ -204,17 +230,15 @@ class _AddState extends State<AddPage> {
               setState(() {
                 image = pickedFile;
               });
-              // ทำอะไรกับ imagePath ต่อไป
             }
           },
           child: Center(
             child: Container(
-              width: 300, // กำหนดความกว้างของรูปภาพตามที่คุณต้องการ
-              height: 200, // กำหนดความสูงของรูปภาพตามที่คุณต้องการ
+              width: 300,
+              height: 200,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(
-                    10), // กำหนดรูปร่างของ Container เป็นสี่เหลี่ยมมุมโค้ง
-                color: Colors.white, // กำหนดสีพื้นหลังของ Container
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
               ),
               child: image != null
                   ? Image.file(
@@ -280,14 +304,12 @@ class _AddState extends State<AddPage> {
           ),
         ),
         Container(
-          height: 35, // กำหนดความสูงของ ListView
+          height: 35,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _searchResults.length +
-                1, // เพิ่ม 1 เพื่อให้มีปุ่ม "Refresh" ด้วย
+            itemCount: _searchResults.length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
-                // ใส่ปุ่ม "Refresh" ที่ index 0
                 return IconButton(
                     onPressed: () {
                       _refreshChoiceChips();
@@ -309,12 +331,11 @@ class _AddState extends State<AddPage> {
                       selected: _selectedIngredients.contains(result),
                       onSelected: (selected) {
                         if (selected) {
-                          // เรียกใช้ showDialog และกำหนดค่าเริ่มต้นของ TextField
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              unitController.text = result.ingredientsUnits
-                                  .toString(); // กำหนดค่าเริ่มต้นให้กับ TextField
+                              unitController.text =
+                                  result.ingredientsUnits.toString();
                               return AlertDialog(
                                 title: Text(result.ingredientsName),
                                 content: Column(
@@ -380,13 +401,11 @@ class _AddState extends State<AddPage> {
           ),
         ),
         Visibility(
-          visible: _selectedIngredients.isNotEmpty, // ตรวจสอบว่ามีรายการหรือไม่
+          visible: _selectedIngredients.isNotEmpty,
           child: SingleChildScrollView(
             child: Container(
-              padding: EdgeInsets.all(
-                  5), // ปรับ padding เพื่อลดขนาดของ Container ภายใน
-              margin: EdgeInsets.all(
-                  5), // ปรับ margin เพื่อลดขนาดของ Container ภายใน
+              padding: EdgeInsets.all(5),
+              margin: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
@@ -399,11 +418,9 @@ class _AddState extends State<AddPage> {
                   final index =
                       _selectedIngredients.indexOf(selectedIngredient);
                   return Row(
-                    // จัดให้รายการแสดงต่อกันโดยไม่มีช่องว่าง
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.25, // กำหนดความกว้างของคอลัมน์ 2
+                        width: MediaQuery.of(context).size.width * 0.25,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -415,8 +432,7 @@ class _AddState extends State<AddPage> {
                         ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.25, // กำหนดความกว้างของคอลัมน์ 3
+                        width: MediaQuery.of(context).size.width * 0.25,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -443,8 +459,7 @@ class _AddState extends State<AddPage> {
                         ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.25, // กำหนดความกว้างของคอลัมน์ 4
+                        width: MediaQuery.of(context).size.width * 0.25,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -466,14 +481,12 @@ class _AddState extends State<AddPage> {
                         ),
                       ),
                       Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.18, // กำหนดความกว้างของคอลัมน์ 1
+                        width: MediaQuery.of(context).size.width * 0.18,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             IconButton(
-                              icon: Icon(
-                                  Icons.cancel), // อัพเดทไอคอนตามที่คุณต้องการ
+                              icon: Icon(Icons.cancel),
                               onPressed: () {
                                 setState(() {
                                   _selectedIngredients

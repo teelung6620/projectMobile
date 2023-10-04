@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_unnecessary_containers, prefer_const_constructors
 
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 
 import '../components/input_textfield.dart';
@@ -17,6 +19,8 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   RegisterationController registerationController =
       Get.put(RegisterationController());
+  ImagePicker picker = ImagePicker();
+  XFile? image;
 
   var isLogin = false.obs;
   @override
@@ -38,6 +42,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Image.asset(
                       'lib/assets/logoNew.png',
                       scale: 2.5,
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        final pickedFile =
+                            await picker.pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          setState(() {
+                            image = pickedFile;
+                          });
+                          // ทำอะไรกับ imagePath ต่อไป
+                        }
+                      },
+                      child: Center(
+                          child: CircleAvatar(
+                        radius: 100, // กำหนดรัศมีของ Circle Avatar
+                        backgroundColor: Colors.white, // กำหนดสีพื้นหลัง
+                        child: image != null
+                            ? ClipOval(
+                                child: Image.file(
+                                  File(image!.path),
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Text(
+                                'เลือกรูปภาพของคุณ',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Color.fromARGB(255, 114, 26, 236),
+                                ),
+                              ),
+                      )),
                     ),
                     SizedBox(
                       height: 20,
@@ -101,7 +138,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           height: 20,
         ),
         SubmitButton(
-          onPressed: () => registerationController.registerWithEmail(),
+          onPressed: () =>
+              registerationController.registerWithEmail(image!.path),
           title: 'Register',
         )
       ],

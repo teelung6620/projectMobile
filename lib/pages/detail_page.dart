@@ -228,87 +228,89 @@ class _DetailState extends State<DetailPage> {
                 ),
 
                 Container(
-                    padding: EdgeInsets.all(10),
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border:
-                          Border.all(color: Color.fromARGB(255, 130, 80, 184)),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: comment.length,
-                      itemBuilder: (context, index) {
-                        if (comment[index].postId == widget.userP.postId) {
-                          return Container(
-                            padding: EdgeInsets.all(10),
-                            margin: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 244, 237, 255),
-                              borderRadius: BorderRadius.circular(10),
-                              // กำหนดรูปร่างขอบเขต
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 25,
-                                      backgroundImage: NetworkImage(
-                                        'http://10.0.2.2:4000/uploadPostImage/${comment[index].userImage}',
-                                      ),
+                  // padding: EdgeInsets.all(10),
+                  // margin: EdgeInsets.all(10),
+                  // decoration: BoxDecoration(
+                  //   color: Colors.white,
+                  //   border: Border.all(
+                  //     color: Color.fromARGB(255, 130, 80, 184),
+                  //   ),
+                  //   borderRadius: BorderRadius.circular(10),
+                  // ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: comment.length,
+                    itemBuilder: (context, index) {
+                      if (comment[index].postId == widget.userP.postId) {
+                        return Container(
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Color.fromARGB(255, 244, 237, 255),
+                            borderRadius: BorderRadius.circular(10),
+                            // กำหนดรูปร่างขอบเขต
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: NetworkImage(
+                                      'http://10.0.2.2:4000/uploadPostImage/${comment[index].userImage}',
                                     ),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: Color.fromARGB(
-                                                  255, 179, 140, 255),
-                                              width: 2,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(5),
+                                  ),
+                                  SizedBox(
+                                    width: 15,
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
                                             color: Color.fromARGB(
                                                 255, 179, 140, 255),
+                                            width: 2,
                                           ),
-                                          padding: EdgeInsets.all(2),
-                                          child: Text(
-                                            comment[index].userName,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              color: Color.fromARGB(
-                                                  255, 255, 255, 255),
-                                            ),
-                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          color: Color.fromARGB(
+                                              255, 179, 140, 255),
                                         ),
-                                        Text(
-                                          comment[index].commentLine,
+                                        padding: EdgeInsets.all(2),
+                                        child: Text(
+                                          comment[index].userName,
                                           style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16,
+                                            fontSize: 14,
+                                            color: Color.fromARGB(
+                                                255, 255, 255, 255),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return SizedBox.shrink();
-                        }
-                      },
-                    ))
+                                      ),
+                                      Text(
+                                        comment[index].commentLine,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    },
+                  ),
+                )
               ],
             ),
           ),

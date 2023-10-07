@@ -5,6 +5,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/submitButton.dart';
 import '../constant/constants.dart';
+import '../model/Ingredients.list.dart';
 import '../model/post.dart';
 import '../model/userPost.dart';
 import 'detail_page.dart';
@@ -33,6 +34,9 @@ class _ListState extends State<ListPage> {
   List<String> selectedChips = [];
   TextEditingController _searchController = TextEditingController();
   List<UserPost> _split = [];
+  List<IngredientList> _searchResults = [];
+  List<IngredientList> IGDResults = [];
+  List<IngredientList> _selectedIngredients = [];
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -69,12 +73,6 @@ class _ListState extends State<ListPage> {
   //   return "Success";
   // }
 
-  @override
-  void initState() {
-    super.initState();
-    getPost();
-  }
-
   // void updateposts(String value) {
   //   setState(() {
   //     if (value.isEmpty) {
@@ -95,11 +93,12 @@ class _ListState extends State<ListPage> {
         newPosts = posts;
       } else {
         newPosts = posts.where((result) {
-          return selectedChips.any((chip) => result.postTypes.contains(chip));
+          return selectedChips.any((chip) => result.ingredientsId
+              .map((ingredient) => ingredient.ingredientsName)
+              .contains(chip));
         }).toList();
       }
     });
-    return;
   }
 
   void _toggleChip(String chipLabel) {
@@ -111,6 +110,61 @@ class _ListState extends State<ListPage> {
       }
       updateposts(); // เมื่อเลือก/ยกเลิกชิป จะกรองรายการใหม่
     });
+  }
+
+  Future getIGD() async {
+    var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
+    var response = await http.get(url);
+    IGDResults = ingredientListFromJson(response.body);
+
+    setState(() {
+      _searchResults = IGDResults.where((result) =>
+          result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              ) &&
+          !_selectedIngredients.contains(result)).toList();
+    });
+  }
+
+  _onSearchChanged() {
+    setState(() {
+      _searchResults = IGDResults.where(
+          (result) => result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              )).toList();
+    });
+  }
+
+  void _onIngredientRemoved(IngredientList ingredient) {
+    setState(() {
+      _selectedIngredients.remove(ingredient);
+      _searchResults = IGDResults.where((result) =>
+          result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              ) &&
+          !_selectedIngredients.contains(result)).toList();
+    });
+  }
+
+  void _refreshChoiceChips() {
+    setState(() {
+      _selectedIngredients.clear();
+
+      _searchResults = IGDResults.where(
+          (result) => result.ingredientsName.toLowerCase().contains(
+                _searchController.text.toLowerCase(),
+              )).toList();
+
+      // อัปเดตรายการ ingredientsIdList
+      // postController.ingredientsIdList = _selectedIngredients;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getIGD();
+    getPost();
   }
 
   //--------------------------------------------------------------------------------------------------------------------
@@ -153,10 +207,104 @@ class _ListState extends State<ListPage> {
                             .toLowerCase()
                             .contains(query.toLowerCase()))
                         .toList();
+
+                    // เพิ่มส่วนนี้เพื่อกรอง ChoiceChip
+                    _searchResults = IGDResults.where((result) =>
+                        result.ingredientsName
+                            .toLowerCase()
+                            .contains(query.toLowerCase()) &&
+                        !_selectedIngredients.contains(result)).toList();
                   });
                 },
                 controller: _searchController,
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+              ),
+            ),
+            Container(
+              height: 35,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _searchResults.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return IconButton(
+                      onPressed: () {
+                        _refreshChoiceChips();
+                      },
+                      icon: Icon(Icons.refresh),
+                    );
+                  } else {
+                    final result = _searchResults[index - 1];
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 18.0),
+                        ChoiceChip(
+                          backgroundColor: Color.fromARGB(255, 230, 210, 255),
+                          key: ValueKey(result),
+                          label: Text(
+                            result.ingredientsName,
+                            style:
+                                TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                          ),
+                          selected:
+                              selectedChips.contains(result.ingredientsName),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedChips.add(result.ingredientsName);
+                                _selectedIngredients.add(
+                                    result); // ตรวจสอบการเพิ่ม ChoiceChip ลงใน _selectedIngredients
+                              } else {
+                                selectedChips.remove(result.ingredientsName);
+                                _selectedIngredients.remove(
+                                    result); // ตรวจสอบการลบ ChoiceChip ออกจาก _selectedIngredients
+                              }
+                              updateposts();
+                            });
+                          },
+                        )
+                      ],
+                    );
+                  }
+                },
+              ),
+            ),
+
+            Visibility(
+              visible: _selectedIngredients.isNotEmpty,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  margin: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Color.fromARGB(255, 130, 80, 184),
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Wrap(
+                    children: _selectedIngredients.map((selectedIngredient) {
+                      return Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Chip(
+                          label: Text(selectedIngredient.ingredientsName),
+                          onDeleted: () {
+                            setState(() {
+                              _onIngredientRemoved(selectedIngredient);
+                              selectedChips.remove(selectedIngredient
+                                  .ingredientsName); // ลบชื่ออาหารออกจาก selectedChips
+                              updateposts();
+                            });
+                          },
+                          backgroundColor: Color.fromARGB(255, 229, 156, 255),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
             ),
 

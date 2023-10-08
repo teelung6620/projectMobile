@@ -57,10 +57,6 @@ class _DetailState extends State<DetailPage> {
   final url = 'http://10.0.2.2:4000/uploadPostImage/';
   @override
   Widget build(BuildContext context) {
-    int totalCalories = 0;
-    widget.userP.ingredientsId.forEach((ingredient) {
-      totalCalories += ingredient.ingredientsCal;
-    });
     return Scaffold(
         appBar: AppBar(
           // automaticallyImplyLeading: false,
@@ -168,22 +164,21 @@ class _DetailState extends State<DetailPage> {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
-                  margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                        color: Color.fromARGB(
-                            255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
-                    borderRadius:
-                        BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
-                  ),
-                  child: Text(
-                    'TOTAL CALORIES : $totalCalories ',
-                    style: const TextStyle(fontSize: 17),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
+                    padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
+                    margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                          color: Color.fromARGB(
+                              255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
+                      borderRadius:
+                          BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
+                    ),
+                    child: Text(
+                      'TOTAL CALORIES : ${widget.userP.totalCal}',
+                      style: const TextStyle(fontSize: 15),
+                      textAlign: TextAlign.left,
+                    )),
 
                 Text(
                   '   วิธีทำ',

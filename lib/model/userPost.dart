@@ -20,6 +20,7 @@ class UserPost {
   String postImage;
   DateTime postTime;
   String userName;
+  int? totalCal;
 
   UserPost({
     required this.postId,
@@ -31,6 +32,7 @@ class UserPost {
     required this.postImage,
     required this.postTime,
     required this.userName,
+    required this.totalCal,
   });
 
   factory UserPost.fromJson(Map<String, dynamic> json) => UserPost(
@@ -44,6 +46,7 @@ class UserPost {
         postImage: json["post_image"],
         postTime: DateTime.parse(json["post_time"]),
         userName: json["user_name"],
+        totalCal: json["totalCal"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -57,6 +60,7 @@ class UserPost {
         "post_image": postImage,
         "post_time": postTime.toIso8601String(),
         "user_name": userName,
+        "totalCal": totalCal,
       };
 }
 

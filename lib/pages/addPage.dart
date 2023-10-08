@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
-import 'package:project_mobile/model/userPost.dart';
+
 import 'package:project_mobile/pages/ListPage.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,6 +33,8 @@ class _ListState extends State<ListPage> {
   List<UserPost> newPosts = [];
   List<String> selectedChips = [];
   TextEditingController _searchController = TextEditingController();
+  TextEditingController _caloriesController =
+      TextEditingController(); // Added for calories input
   List<UserPost> _split = [];
   List<IngredientList> _searchResults = [];
   List<IngredientList> IGDResults = [];
@@ -59,34 +61,7 @@ class _ListState extends State<ListPage> {
   }
 
   List imagesUrl = [];
-  // Future<String> fetchDataFromApi() async {
-  //   var url = Uri.parse("http://10.0.2.2:4000/updatePostImage");
 
-  //   var jsonData = await http.get(url);
-  //   var fetchData = jsonDecode(jsonData.body);
-  //   setState(() {
-  //     newPosts = fetchData;
-  //     newPosts.forEach((element) {
-  //       imagesUrl.add(element.postImage);
-  //     });
-  //   });
-  //   return "Success";
-  // }
-
-  // void updateposts(String value) {
-  //   setState(() {
-  //     if (value.isEmpty) {
-  //       newPosts = posts;
-  //     } else {
-  //       newPosts = posts
-  //           .where((element) => element.postName
-  //               .toLowerCase()
-  //               .contains(value.toLowerCase())&& (selectedChips == 'All' ||postFilter.all == selectedChips))
-  //           .toList();
-  //     }
-  //   });
-  //   return;
-  // }
   void updateposts() {
     setState(() {
       if (selectedChips.isEmpty) {
@@ -108,7 +83,7 @@ class _ListState extends State<ListPage> {
       } else {
         selectedChips.add(chipLabel);
       }
-      updateposts(); // เมื่อเลือก/ยกเลิกชิป จะกรองรายการใหม่
+      updateposts();
     });
   }
 
@@ -149,14 +124,11 @@ class _ListState extends State<ListPage> {
   void _refreshChoiceChips() {
     setState(() {
       _selectedIngredients.clear();
-
+      selectedChips.clear();
       _searchResults = IGDResults.where(
           (result) => result.ingredientsName.toLowerCase().contains(
                 _searchController.text.toLowerCase(),
               )).toList();
-
-      // อัปเดตรายการ ingredientsIdList
-      // postController.ingredientsIdList = _selectedIngredients;
     });
   }
 
@@ -167,7 +139,6 @@ class _ListState extends State<ListPage> {
     getPost();
   }
 
-  //--------------------------------------------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -178,8 +149,7 @@ class _ListState extends State<ListPage> {
         body: Column(
           children: [
             SubmitButton(
-              onPressed: () //=> postController.postMenuUser(),
-                  {
+              onPressed: () {
                 Logout();
               },
               title: 'Log out',
@@ -188,18 +158,20 @@ class _ListState extends State<ListPage> {
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 decoration: InputDecoration(
-                    filled: true, //<-- SEE HERE
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25.0)),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    ),
-                    hintText: 'Enter a search term',
-                    contentPadding: EdgeInsets.only(
-                      left: 15.0,
-                    )),
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 255, 255, 255),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.black,
+                  ),
+                  hintText: 'Enter a search term',
+                  contentPadding: EdgeInsets.only(
+                    left: 15.0,
+                  ),
+                ),
                 onChanged: (query) {
                   setState(() {
                     newPosts = posts
@@ -207,19 +179,17 @@ class _ListState extends State<ListPage> {
                             .toLowerCase()
                             .contains(query.toLowerCase()))
                         .toList();
-
-                    // เพิ่มส่วนนี้เพื่อกรอง ChoiceChip
-                    _searchResults = IGDResults.where((result) =>
-                        result.ingredientsName
-                            .toLowerCase()
-                            .contains(query.toLowerCase()) &&
-                        !_selectedIngredients.contains(result)).toList();
+                    _searchResults = IGDResults.where((result) => result
+                        .ingredientsName
+                        .toLowerCase()
+                        .contains(query.toLowerCase())).toList();
                   });
                 },
                 controller: _searchController,
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
+
             Container(
               height: 35,
               child: ListView.builder(
@@ -271,43 +241,6 @@ class _ListState extends State<ListPage> {
               ),
             ),
 
-            Visibility(
-              visible: _selectedIngredients.isNotEmpty,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: Color.fromARGB(255, 130, 80, 184),
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Wrap(
-                    children: _selectedIngredients.map((selectedIngredient) {
-                      return Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Chip(
-                          label: Text(selectedIngredient.ingredientsName),
-                          onDeleted: () {
-                            setState(() {
-                              _onIngredientRemoved(selectedIngredient);
-                              selectedChips.remove(selectedIngredient
-                                  .ingredientsName); // ลบชื่ออาหารออกจาก selectedChips
-                              updateposts();
-                            });
-                          },
-                          backgroundColor: Color.fromARGB(255, 229, 156, 255),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ),
-
             Row(
               children: [
                 const SizedBox(height: 5.0),
@@ -354,7 +287,78 @@ class _ListState extends State<ListPage> {
                     // เพิ่ม Filter Chip
                   ],
                 ),
+                SizedBox(
+                  width: 70,
+                  height: 30,
+                  child: TextField(
+                    // For filtering by calories
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      // hintText: 'enter  ',
+                      contentPadding: EdgeInsets.only(right: 5.0),
+                    ),
+                    textAlign: TextAlign.right,
+                    onChanged: (query) {
+                      if (int.tryParse(query) != null) {
+                        setState(() {
+                          newPosts = posts
+                              .where((result) =>
+                                  result.totalCal == null ||
+                                  result.totalCal! <= int.parse(query))
+                              .toList();
+                        });
+                      } else {
+                        setState(() {
+                          newPosts = posts;
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: _caloriesController,
+                    style: TextStyle(color: Colors.black, fontSize: 20),
+                    //textAlign: TextAlign.left,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(
+                          5), // จำกัดจำนวนตัวเลขให้มีไม่เกิน 4 หลัก
+                    ],
+                  ),
+                ),
+                Text(
+                  '  KCAL',
+                  style: TextStyle(fontSize: 18),
+                )
+                // Rest of your code...
               ],
+            ),
+
+            Visibility(
+              visible: _selectedIngredients.isNotEmpty,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Wrap(
+                  children: _selectedIngredients.map((selectedIngredient) {
+                    return Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Chip(
+                        label: Text(selectedIngredient.ingredientsName),
+                        onDeleted: () {
+                          setState(() {
+                            _onIngredientRemoved(selectedIngredient);
+                            selectedChips.remove(selectedIngredient
+                                .ingredientsName); // ลบชื่ออาหารออกจาก selectedChips
+                            updateposts();
+                          });
+                        },
+                        backgroundColor: Color.fromARGB(255, 229, 156, 255),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
 
             // Row(
@@ -397,63 +401,172 @@ class _ListState extends State<ListPage> {
                   child: Column(
                     children: [
                       ListView.builder(
-                        shrinkWrap:
-                            true, // สำคัญ: คำสั่งนี้ช่วยให้ ListView.builder สามารถทำงานร่วมกับ SingleChildScrollView ได้
+                        shrinkWrap: true,
                         itemCount: newPosts.length,
                         padding: EdgeInsets.all(8),
-                        physics:
-                            NeverScrollableScrollPhysics(), // ยกเลิกการเลื่อนเพิ่มเติมสำหรับ ListView นี้
+                        physics: NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
                           var reverseindex = newPosts.length - 1 - index;
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
                               width: 20,
-                              height: 80,
+                              height: 150,
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DetailPage(
-                                        userP: posts[reverseindex],
-                                        post_id: posts[reverseindex].postId,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Align(
-                                  child: ListTile(
-                                    subtitleTextStyle: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.normal),
-                                    titleTextStyle: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.normal),
-                                    leading: Image(
-                                      image: NetworkImage(
-                                        'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                                      ),
-                                    ),
-                                    title: Text(
-                                      newPosts[reverseindex].postName,
-                                      textAlign: TextAlign.right,
-                                    ),
-                                    subtitle: Text(
-                                      newPosts[reverseindex].userName,
-                                      textAlign: TextAlign.right,
-                                    ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
                                   ),
-                                ),
-                              ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailPage(
+                                          userP: posts[reverseindex],
+                                          post_id: posts[reverseindex].postId,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .only(
+                                                      top:
+                                                          10.0), // เพิ่มระยะห่างด้านบน
+                                                  child: Image(
+                                                    image: NetworkImage(
+                                                      'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
+                                                    ),
+                                                    width: 100,
+                                                    height: 80,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Text(
+                                                "${newPosts[reverseindex].totalCal} KCAL",
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Colors.black),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 50.0),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment
+                                                  .start, // จัดเรียงข้อความด้านซ้าย
+                                              children: [
+                                                Text(
+                                                  newPosts[reverseindex]
+                                                      .postName,
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 20),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Color.fromARGB(
+                                                          255, 179, 140, 255),
+                                                      width: 2,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5),
+                                                    color: Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                  ),
+                                                  padding: EdgeInsets.all(2),
+                                                  child: Text(
+                                                    newPosts[reverseindex]
+                                                        .userName,
+                                                    style: TextStyle(
+                                                        color: Color.fromARGB(
+                                                            255, 138, 80, 255),
+                                                        fontSize: 15),
+                                                    textAlign: TextAlign.left,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+
+                                  // Align(
+                                  //   child: ListTile(
+                                  //     subtitleTextStyle: const TextStyle(
+                                  //       fontSize: 20,
+                                  //       fontWeight: FontWeight.normal,
+                                  //     ),
+                                  //     titleTextStyle: const TextStyle(
+                                  //       color: Colors.black,
+                                  //       fontSize: 25,
+                                  //       fontWeight: FontWeight.normal,
+                                  //     ),
+                                  //     leading: Expanded(
+                                  //       child: Image(
+                                  //         image: NetworkImage(
+                                  //           'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     title: Text(
+                                  //       newPosts[reverseindex].postName,
+                                  //       textAlign: TextAlign.left,
+                                  //     ),
+                                  //     subtitle: Text(
+                                  //       newPosts[reverseindex].userName,
+                                  //       textAlign: TextAlign.left,
+                                  //     ),
+                                  //     trailing: Container(
+                                  //       width:
+                                  //           100, // ปรับความกว้างของช่องแสดง totalCal ตามที่คุณต้องการ
+                                  //       alignment: Alignment
+                                  //           .centerRight, // จัดตำแหน่งข้อความที่ด้านขวา
+                                  //       child: newPosts[reverseindex].totalCal !=
+                                  //               null
+                                  //           ? Text(
+                                  //               "${newPosts[reverseindex].totalCal}",
+                                  //               style: TextStyle(
+                                  //                 fontSize: 18,
+                                  //                 fontWeight: FontWeight.bold,
+                                  //               ),
+                                  //             )
+                                  //           : SizedBox(),
+                                  //     ),
+                                  //   ),
+                                  // ),
+                                  ),
                             ),
                           );
                         },

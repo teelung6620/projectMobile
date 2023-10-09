@@ -33,7 +33,7 @@ class _MyHomePageState extends State<HomePage> {
     });
   }
 
-  final List<Widget> _pages = [ListPage(), AddPage(), BookPage(), YoursPage()];
+  final List<Widget> _pages = [ListPage(), AddPage(), BookPage(), YourPages()];
 
   @override
   Widget build(BuildContext context) {

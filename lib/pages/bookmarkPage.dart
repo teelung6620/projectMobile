@@ -19,6 +19,7 @@ import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
 import '../components/submitButton.dart';
+import '../controller/bookmarkController.dart';
 import '../controller/registeration_controller.dart';
 import '../model/userPost.dart';
 import 'detail_page.dart';
@@ -68,9 +69,11 @@ class _BookState extends State<BookPage> {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       userId = int.tryParse(decodedToken['user_id'].toString());
 
+      print(userId);
+
       // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
-      await getBookmark();
-      await getPost();
+      // await getBookmark();
+      // await getPost();
     } catch (error) {
       print('Error decoding token: $error');
     }
@@ -222,56 +225,37 @@ class _BookState extends State<BookPage> {
                                               ],
                                             ),
                                           ),
+                                          Spacer(),
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              await BookmarkController()
+                                                  .deleteBookmark(
+                                                postId:
+                                                    posts[reverseindex].postId,
+                                                bookmarkId:
+                                                    bookmark[reverseindex]
+                                                        .bookmarkId,
+                                              );
+
+                                              // เมื่อลบ bookmark เสร็จให้เรียก getPost() เพื่อรีเฟรชหน้าจอ
+                                              await getPost();
+                                              setState(() {});
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  const Color.fromARGB(
+                                                      255, 255, 255, 255),
+                                            ),
+                                            child: Icon(
+                                              Icons.delete,
+                                              color: Color.fromARGB(
+                                                  255, 215, 158, 255),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ],
-                                  )
-
-                                  // Align(
-                                  //   child: ListTile(
-                                  //     subtitleTextStyle: const TextStyle(
-                                  //       fontSize: 20,
-                                  //       fontWeight: FontWeight.normal,
-                                  //     ),
-                                  //     titleTextStyle: const TextStyle(
-                                  //       color: Colors.black,
-                                  //       fontSize: 25,
-                                  //       fontWeight: FontWeight.normal,
-                                  //     ),
-                                  //     leading: Expanded(
-                                  //       child: Image(
-                                  //         image: NetworkImage(
-                                  //           'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                                  //         ),
-                                  //       ),
-                                  //     ),
-                                  //     title: Text(
-                                  //       newPosts[reverseindex].postName,
-                                  //       textAlign: TextAlign.left,
-                                  //     ),
-                                  //     subtitle: Text(
-                                  //       newPosts[reverseindex].userName,
-                                  //       textAlign: TextAlign.left,
-                                  //     ),
-                                  //     trailing: Container(
-                                  //       width:
-                                  //           100, // ปรับความกว้างของช่องแสดง totalCal ตามที่คุณต้องการ
-                                  //       alignment: Alignment
-                                  //           .centerRight, // จัดตำแหน่งข้อความที่ด้านขวา
-                                  //       child: newPosts[reverseindex].totalCal !=
-                                  //               null
-                                  //           ? Text(
-                                  //               "${newPosts[reverseindex].totalCal}",
-                                  //               style: TextStyle(
-                                  //                 fontSize: 18,
-                                  //                 fontWeight: FontWeight.bold,
-                                  //               ),
-                                  //             )
-                                  //           : SizedBox(),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  ),
+                                  )),
                             ),
                           );
                         },

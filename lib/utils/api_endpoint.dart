@@ -8,4 +8,6 @@ class _AuthEndPoints {
   final String loginEmail = '/login';
   final String postMenu = '/post_data';
   final String commentPost = '/comments';
+  final String bookmarkPost = '/bookmarks';
+  final String DELbookmarkPost = '/DELbookmarks';
 }

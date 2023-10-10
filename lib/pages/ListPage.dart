@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/submitButton.dart';
 import '../constant/constants.dart';
+import '../controller/bookmarkController.dart';
 import '../model/Ingredients.list.dart';
 import '../model/post.dart';
 import '../model/userPost.dart';
@@ -39,11 +41,29 @@ class _ListState extends State<ListPage> {
   List<IngredientList> _searchResults = [];
   List<IngredientList> IGDResults = [];
   List<IngredientList> _selectedIngredients = [];
+  int? userId;
+  String? userName;
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
     Get.offAll(LoginScreen());
+  }
+
+  Future<void> _printUserIdFromToken(String token) async {
+    try {
+      final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      userId = int.tryParse(decodedToken['user_id'].toString());
+      userName = decodedToken['user_name'];
+      print(userId);
+      print(userName);
+
+      // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
+      // await getBookmark();
+      // await getPost();
+    } catch (error) {
+      print('Error decoding token: $error');
+    }
   }
 
   // get teams
@@ -132,11 +152,23 @@ class _ListState extends State<ListPage> {
     });
   }
 
+  String? getUserNameFromToken(String token) {
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+    String? userName = decodedToken['user_name'];
+    return userName;
+  }
+
   @override
   void initState() {
     super.initState();
     getIGD();
     getPost();
+    SharedPreferences.getInstance().then((prefs) {
+      final String? token = prefs.getString('token');
+      if (token != null) {
+        _printUserIdFromToken(token);
+      }
+    });
   }
 
   @override
@@ -148,11 +180,16 @@ class _ListState extends State<ListPage> {
         backgroundColor: Color.fromARGB(255, 245, 238, 255),
         body: Column(
           children: [
-            SubmitButton(
-              onPressed: () {
-                Logout();
-              },
-              title: 'Log out',
+            Row(
+              children: [
+                SubmitButton(
+                  onPressed: () {
+                    Logout();
+                  },
+                  title: 'Log out',
+                ),
+                Text('$userName'),
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -189,7 +226,6 @@ class _ListState extends State<ListPage> {
                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
-
             Container(
               height: 35,
               child: ListView.builder(
@@ -240,7 +276,6 @@ class _ListState extends State<ListPage> {
                 },
               ),
             ),
-
             Row(
               children: [
                 const SizedBox(height: 5.0),
@@ -334,7 +369,6 @@ class _ListState extends State<ListPage> {
                 // Rest of your code...
               ],
             ),
-
             Visibility(
               visible: _selectedIngredients.isNotEmpty,
               child: SingleChildScrollView(
@@ -360,37 +394,6 @@ class _ListState extends State<ListPage> {
                 ),
               ),
             ),
-
-            // Row(
-            //   children: [
-            //     SizedBox(
-            //       width: 20,
-            //     ),
-            //     DropdownButton<String>(
-            //       iconEnabledColor: Colors.white,
-            //       borderRadius: BorderRadius.circular(25.0),
-            //       dropdownColor: Colors.white,
-            //       value: selectedCategory,
-            //       onChanged: (newValue) {
-            //         setState(() {
-            //           chipupdateposts(searchText);
-            //         });
-            //       },
-            //       items: [
-            //         'All',
-            //         'food',
-            //         'sweet',s
-            //         'drink'
-            //       ] // Add more categories here...
-            //           .map<DropdownMenuItem<String>>((String value) {
-            //         return DropdownMenuItem<String>(
-            //           value: value,
-            //           child: Text(value),
-            //         );
-            //       }).toList(),
-            //     ),
-            //   ],
-            // ),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
@@ -515,6 +518,35 @@ class _ListState extends State<ListPage> {
                                                   ),
                                                 )
                                               ],
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          InkWell(
+                                            onTap: () {
+                                              BookmarkController().BookmarkUser(
+                                                newPosts[reverseindex].postId,
+                                              );
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.5),
+                                                    spreadRadius: 5,
+                                                    blurRadius: 5,
+                                                    offset: Offset(0, 3),
+                                                  ),
+                                                ],
+                                              ),
+                                              padding: EdgeInsets.all(10),
+                                              child: Icon(
+                                                Icons.bookmark_add,
+                                                color: Color.fromARGB(
+                                                    255, 215, 158, 255),
+                                              ),
                                             ),
                                           ),
                                         ],

@@ -63,6 +63,7 @@ class _AddState extends State<AddPage> {
   void initState() {
     super.initState();
     getIGD();
+    _selectedItem;
   }
 
   _onSearchChanged() {

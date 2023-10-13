@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/auth/auth_screen.dart';
+import 'package:project_mobile/pages/ADMINpages/adminPage.dart';
 import 'package:project_mobile/pages/home.dart';
 import 'package:project_mobile/pages/login_page.dart';
 import 'package:project_mobile/pages/login_page2.dart';
@@ -23,6 +24,12 @@ class MyApp extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  bool isAdmin() {
+    final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+    final userType = decodedToken['user_type'];
+    return userType == 'admin';
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
@@ -31,10 +38,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      //home: const LoginPage(),
+      // home: const LoginPage(),
       home: (token != null && JwtDecoder.isExpired(token!) == false)
-          ? HomePage(token: token!)
+          ? (isAdmin() ? AdminPage(token: token!) : HomePage(token: token!))
           : LoginScreen(),
+
+      // home: AuthScreen(token: token),
     );
   }
 }
+
+// auth/auth_screen.dart
+

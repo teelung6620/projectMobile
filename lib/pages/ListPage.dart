@@ -4,6 +4,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../components/logoutButton.dart';
 import '../components/submitButton.dart';
 import '../constant/constants.dart';
 import '../controller/bookmarkController.dart';
@@ -14,7 +15,7 @@ import 'detail_page.dart';
 import 'home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'dart:ui' as ui;
 import 'login_page2.dart';
 
 enum postFilter {
@@ -43,6 +44,8 @@ class _ListState extends State<ListPage> {
   List<IngredientList> _selectedIngredients = [];
   int? userId;
   String? userName;
+  String? userEmail;
+  String? userImage;
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -55,8 +58,12 @@ class _ListState extends State<ListPage> {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       userId = int.tryParse(decodedToken['user_id'].toString());
       userName = decodedToken['user_name'];
+      userEmail = decodedToken['user_email'];
+      userImage = decodedToken['user_image'];
       print(userId);
       print(userName);
+      print(userEmail);
+      print(userImage);
 
       // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
       // await getBookmark();
@@ -89,8 +96,9 @@ class _ListState extends State<ListPage> {
       } else {
         newPosts = posts.where((result) {
           return selectedChips.any((chip) => result.ingredientsId
-              .map((ingredient) => ingredient.ingredientsName)
-              .contains(chip));
+                  .map((ingredient) => ingredient.ingredientsName)
+                  .contains(chip)) ||
+              selectedChips.any((chip) => result.postTypes.contains(chip));
         }).toList();
       }
     });
@@ -182,13 +190,68 @@ class _ListState extends State<ListPage> {
           children: [
             Row(
               children: [
-                SubmitButton(
-                  onPressed: () {
-                    Logout();
-                  },
-                  title: 'Log out',
+                // LogoutButton(
+                //   onPressed:
+                //   title: 'Log out',
+                // ),
+                SizedBox(
+                  width: 10,
                 ),
-                Text('$userName'),
+                IconButton(
+                    onPressed: () {
+                      Logout();
+                    },
+                    icon: Icon(
+                      Icons.logout,
+                      size: 35,
+                    )),
+                Spacer(),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color.fromARGB(255, 191, 159, 255),
+                      width: 5,
+                    ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30.0),
+                      //bottomLeft: Radius.circular(10.0)
+                    ),
+                    color: Color.fromARGB(255, 191, 159, 255),
+                  ),
+                  padding: EdgeInsets.all(2),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '$userName',
+                            style: TextStyle(
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          Text(
+                            '$userEmail',
+                            style: TextStyle(fontStyle: FontStyle.italic),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundImage: NetworkImage(
+                          'http://10.0.2.2:4000/uploadPostImage/${userImage}',
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             Padding(
@@ -322,6 +385,15 @@ class _ListState extends State<ListPage> {
                     // เพิ่ม Filter Chip
                   ],
                 ),
+
+                // Rest of your code...
+              ],
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  width: 20.0,
+                ),
                 SizedBox(
                   width: 70,
                   height: 30,
@@ -365,9 +437,11 @@ class _ListState extends State<ListPage> {
                 Text(
                   '  KCAL',
                   style: TextStyle(fontSize: 18),
-                )
-                // Rest of your code...
+                ),
               ],
+            ),
+            SizedBox(
+              height: 5.0,
             ),
             Visibility(
               visible: _selectedIngredients.isNotEmpty,
@@ -414,7 +488,7 @@ class _ListState extends State<ListPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
                               width: 20,
-                              height: 150,
+                              height: 130,
                               decoration: BoxDecoration(
                                 color: Color.fromARGB(255, 255, 255, 255),
                                 borderRadius: BorderRadius.circular(8),

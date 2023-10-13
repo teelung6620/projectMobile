@@ -238,8 +238,11 @@ class _BookState extends State<BookPage> {
                                               );
 
                                               // เมื่อลบ bookmark เสร็จให้เรียก getPost() เพื่อรีเฟรชหน้าจอ
-                                              await getPost();
-                                              setState(() {});
+                                              //await getPost();
+                                              //await getBookmark();
+                                              setState(() {
+                                                getPost();
+                                              }); // ต้องต้องแน่ใจว่าเรียก setState ตรงนี้
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor:

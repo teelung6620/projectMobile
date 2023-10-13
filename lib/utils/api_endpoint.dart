@@ -10,4 +10,5 @@ class _AuthEndPoints {
   final String commentPost = '/comments';
   final String bookmarkPost = '/bookmarks';
   final String DELbookmarkPost = '/DELbookmarks';
+  final String addIGD = '/ingredients_data';
 }

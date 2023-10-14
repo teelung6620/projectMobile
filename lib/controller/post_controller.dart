@@ -91,4 +91,46 @@ class PostController extends GetxController {
       );
     }
   }
+
+  Future<void> deletePost(int postId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      String userId = jwtDecodedToken['user_id'].toString();
+
+      var headers = {'Content-Type': 'application/json'};
+
+      // ส่งคำขอ DELETE ไปยังเซิร์ฟเวอร์เพื่อลบโพสต์
+      var url = Uri.parse(
+          "${ApiEndPoints.baseUrl}${ApiEndPoints.authEndpoints.DELPost}/$postId");
+
+      Map<String, dynamic> body = {
+        'user_id': userId,
+        'post_id': postId,
+      };
+
+      final request = http.Request('DELETE', url);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(body);
+
+      final response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        final responseData = response.body;
+        final json = jsonDecode(responseData);
+
+        if (json['status'] == 'ok') {
+          // ลบโพสต์สำเร็จ
+          // คุณสามารถทำการอัพเดท UI หรือแอปของคุณตามที่ต้องการ
+        } else {
+          // ไม่สามารถลบโพสต์ได้
+          // คุณสามารถจัดการกับข้อผิดพลาดได้ตามที่คุณต้องการ
+        }
+      }
+    } catch (e) {
+      // ดักจับข้อผิดพลาด
+      print('Error: $e');
+    }
+  }
 }

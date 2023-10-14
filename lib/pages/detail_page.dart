@@ -75,95 +75,41 @@ class _DetailState extends State<DetailPage> {
           },
           color: Color.fromARGB(255, 142, 61, 255),
           child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Align(
-                  alignment: Alignment.center, // กำหนดจุดศูนย์กลางให้รูปภาพ
-                  child: Image(
-                    image: NetworkImage(
-                      'http://10.0.2.2:4000/uploadPostImage/${widget.userP.postImage}',
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 255, 255, 255), // สีบน
+                    Color.fromARGB(255, 211, 175, 255), // สีล่าง
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.center, // กำหนดจุดศูนย์กลางให้รูปภาพ
+                    child: Image(
+                      image: NetworkImage(
+                        'http://10.0.2.2:4000/uploadPostImage/${widget.userP.postImage}',
+                      ),
+                      width: 300, // กำหนดความกว้าง
+                      height: 300,
                     ),
-                    width: 300, // กำหนดความกว้าง
-                    height: 300,
                   ),
-                ),
-                // Text(
-                //   userP.userName + '\n',
-                //   style: const TextStyle(fontSize: 20),
-                //   textAlign: TextAlign.right,
-                // ),
-                Text(
-                  '   ส่วนผสม',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 20),
-                ),
-                Container(
-                  padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
-                  margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                        color: Color.fromARGB(
-                            255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
-                    borderRadius:
-                        BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
+                  // Text(
+                  //   userP.userName + '\n',
+                  //   style: const TextStyle(fontSize: 20),
+                  //   textAlign: TextAlign.right,
+                  // ),
+                  Text(
+                    '   ส่วนผสม',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 20),
                   ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.25, // กำหนดความกว้างของคอลัมน์ 1
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children:
-                              widget.userP.ingredientsId.map((ingredient) {
-                            return Text(
-                              '  ' + ingredient.ingredientsName,
-                              style: const TextStyle(fontSize: 15),
-                              textAlign: TextAlign.left,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.2, // กำหนดความกว้างของคอลัมน์ 2
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children:
-                              widget.userP.ingredientsId.map((ingredient) {
-                            return Text(
-                              ingredient.ingredientsUnits.toString() +
-                                  '   ' +
-                                  ingredient.ingredientsUnitsName +
-                                  ' ',
-                              style: const TextStyle(fontSize: 15),
-                              textAlign: TextAlign.left,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width *
-                            0.3, // กำหนดความกว้างของคอลัมน์ 2
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children:
-                              widget.userP.ingredientsId.map((ingredient) {
-                            return Text(
-                              ingredient.ingredientsCal.toString() +
-                                  '   แคลอรี่',
-                              style: const TextStyle(fontSize: 15),
-                              textAlign: TextAlign.left,
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
+                  Container(
                     padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
                     margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
                     decoration: BoxDecoration(
@@ -174,139 +120,205 @@ class _DetailState extends State<DetailPage> {
                       borderRadius:
                           BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
                     ),
-                    child: Text(
-                      'TOTAL CALORIES : ${widget.userP.totalCal}',
-                      style: const TextStyle(fontSize: 15),
-                      textAlign: TextAlign.left,
-                    )),
-
-                Text(
-                  '   วิธีทำ',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 20),
-                ),
-                Container(
-                  padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
-                  margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                        color: Color.fromARGB(
-                            255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
-                    borderRadius:
-                        BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
-                  ),
-                  child: Text(widget.userP.postDescription),
-                ),
-
-                Text(
-                  '   Comments',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 20),
-                ),
-
-                Center(
-                    child: InputTextFieldWidget(
-                        commentsController.commentlineController,
-                        'Add a comment...')),
-                SizedBox(
-                  height: 15,
-                ),
-                Center(
-                  child: CommentButton(
-                    onPressed: () {
-                      commentsController.commentsUser(widget.userP
-                          .postId); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
-                    },
-                    title: 'Comment',
-                  ),
-                ),
-
-                Container(
-                  // padding: EdgeInsets.all(10),
-                  // margin: EdgeInsets.all(10),
-                  // decoration: BoxDecoration(
-                  //   color: Colors.white,
-                  //   border: Border.all(
-                  //     color: Color.fromARGB(255, 130, 80, 184),
-                  //   ),
-                  //   borderRadius: BorderRadius.circular(10),
-                  // ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: comment.length,
-                    itemBuilder: (context, index) {
-                      if (comment[index].postId == widget.userP.postId) {
-                        return Container(
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 244, 237, 255),
-                            borderRadius: BorderRadius.circular(10),
-                            // กำหนดรูปร่างขอบเขต
-                          ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.25, // กำหนดความกว้างของคอลัมน์ 1
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 25,
-                                    backgroundImage: NetworkImage(
-                                      'http://10.0.2.2:4000/uploadPostImage/${comment[index].userImage}',
+                            children:
+                                widget.userP.ingredientsId.map((ingredient) {
+                              return Text(
+                                '  ' + ingredient.ingredientsName,
+                                style: const TextStyle(fontSize: 15),
+                                textAlign: TextAlign.left,
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.2, // กำหนดความกว้างของคอลัมน์ 2
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children:
+                                widget.userP.ingredientsId.map((ingredient) {
+                              return Text(
+                                ingredient.ingredientsUnits.toString() +
+                                    '   ' +
+                                    ingredient.ingredientsUnitsName +
+                                    ' ',
+                                style: const TextStyle(fontSize: 15),
+                                textAlign: TextAlign.left,
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.3, // กำหนดความกว้างของคอลัมน์ 2
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children:
+                                widget.userP.ingredientsId.map((ingredient) {
+                              return Text(
+                                ingredient.ingredientsCal.toString() +
+                                    '   แคลอรี่',
+                                style: const TextStyle(fontSize: 15),
+                                textAlign: TextAlign.left,
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                      padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
+                      margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color.fromARGB(
+                                255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
+                        borderRadius:
+                            BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
+                      ),
+                      child: Text(
+                        'TOTAL CALORIES : ${widget.userP.totalCal}',
+                        style: const TextStyle(fontSize: 15),
+                        textAlign: TextAlign.left,
+                      )),
+
+                  Text(
+                    '   วิธีทำ',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10), // กำหนดระยะห่างรอบคอลัมน์
+                    margin: EdgeInsets.all(10), // กำหนดระยะห่างรอบแถว
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                          color: Color.fromARGB(
+                              255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
+                      borderRadius:
+                          BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
+                    ),
+                    child: Text(widget.userP.postDescription),
+                  ),
+
+                  Text(
+                    '   Comments',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(fontSize: 20),
+                  ),
+
+                  Center(
+                      child: InputTextFieldWidget(
+                          commentsController.commentlineController,
+                          'Add a comment...')),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Center(
+                    child: CommentButton(
+                      onPressed: () {
+                        commentsController.commentsUser(widget.userP
+                            .postId); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
+                      },
+                      title: 'Comment',
+                    ),
+                  ),
+
+                  Container(
+                    // padding: EdgeInsets.all(10),
+                    // margin: EdgeInsets.all(10),
+                    // decoration: BoxDecoration(
+                    //   color: Colors.white,
+                    //   border: Border.all(
+                    //     color: Color.fromARGB(255, 130, 80, 184),
+                    //   ),
+                    //   borderRadius: BorderRadius.circular(10),
+                    // ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: comment.length,
+                      itemBuilder: (context, index) {
+                        if (comment[index].postId == widget.userP.postId) {
+                          return Container(
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(255, 244, 237, 255),
+                              borderRadius: BorderRadius.circular(10),
+                              // กำหนดรูปร่างขอบเขต
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: NetworkImage(
+                                        'http://10.0.2.2:4000/uploadPostImage/${comment[index].userImage}',
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 15,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
+                                    SizedBox(
+                                      width: 15,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Color.fromARGB(
+                                                  255, 179, 140, 255),
+                                              width: 2,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(5),
                                             color: Color.fromARGB(
                                                 255, 179, 140, 255),
-                                            width: 2,
                                           ),
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          color: Color.fromARGB(
-                                              255, 179, 140, 255),
+                                          padding: EdgeInsets.all(2),
+                                          child: Text(
+                                            comment[index].userName,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
+                                            ),
+                                          ),
                                         ),
-                                        padding: EdgeInsets.all(2),
-                                        child: Text(
-                                          comment[index].userName,
+                                        Text(
+                                          comment[index].commentLine,
                                           style: TextStyle(
-                                            fontSize: 14,
-                                            color: Color.fromARGB(
-                                                255, 255, 255, 255),
+                                            color: Colors.black,
+                                            fontSize: 16,
                                           ),
                                         ),
-                                      ),
-                                      Text(
-                                        comment[index].commentLine,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        return SizedBox.shrink();
-                      }
-                    },
-                  ),
-                )
-              ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return SizedBox.shrink();
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ));

@@ -20,7 +20,9 @@ class UserPost {
   String postImage;
   DateTime postTime;
   String userName;
-  int? totalCal;
+  String? averageScore;
+  int numOfScores;
+  int totalCal;
 
   UserPost({
     required this.postId,
@@ -32,6 +34,8 @@ class UserPost {
     required this.postImage,
     required this.postTime,
     required this.userName,
+    required this.averageScore,
+    required this.numOfScores,
     required this.totalCal,
   });
 
@@ -46,6 +50,8 @@ class UserPost {
         postImage: json["post_image"],
         postTime: DateTime.parse(json["post_time"]),
         userName: json["user_name"],
+        averageScore: json["average_score"],
+        numOfScores: json["num_of_scores"],
         totalCal: json["totalCal"],
       );
 
@@ -60,6 +66,8 @@ class UserPost {
         "post_image": postImage,
         "post_time": postTime.toIso8601String(),
         "user_name": userName,
+        "average_score": averageScore,
+        "num_of_scores": numOfScores,
         "totalCal": totalCal,
       };
 }

@@ -68,8 +68,8 @@ class IGDController extends GetxController {
         );
       } else if (response.statusCode == 400) {
         Get.snackbar(
-          'ชื่อซ้ำ',
-          'ชื่อส่วนผสมนี้มีอยู่แล้ว',
+          'ผิดพลาด',
+          'ผสมนี้มีอยู่แล้ว',
           snackPosition: SnackPosition.TOP,
         );
       } else {

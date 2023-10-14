@@ -189,31 +189,43 @@ class _AddState extends State<AddPage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 245, 238, 255),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 50),
-            // MyTextField2(
-            //     controller: postnameController,
-            //     hintText: 'name',
-            //     obscureText: false),
-            // const SizedBox(height: 20),
-            // MyTextField2(
-            //     controller: DescriptController,
-            //     hintText: 'Solution',
-            //     obscureText: false),
-            // const SizedBox(height: 20),
-
-            PostWidget(),
-
-            //_buildSearchResults(),
-
-            SubmitButton(
-              onPressed: () {
-                submitPost();
-              },
-              title: 'CREATE',
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 255, 255, 255), // สีบน
+                Color.fromARGB(255, 175, 110, 255), // สีล่าง
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-          ],
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 50),
+              // MyTextField2(
+              //     controller: postnameController,
+              //     hintText: 'name',
+              //     obscureText: false),
+              // const SizedBox(height: 20),
+              // MyTextField2(
+              //     controller: DescriptController,
+              //     hintText: 'Solution',
+              //     obscureText: false),
+              // const SizedBox(height: 20),
+
+              PostWidget(),
+
+              //_buildSearchResults(),
+
+              SubmitButton(
+                onPressed: () {
+                  submitPost();
+                },
+                title: 'CREATE',
+              ),
+            ],
+          ),
         ),
       ),
     ));

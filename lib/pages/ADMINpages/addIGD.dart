@@ -59,10 +59,37 @@ class _AddIGDState extends State<AddIGDPage> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            Center(
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                // gradient: LinearGradient(
+                //   colors: [
+                //     Color.fromARGB(255, 63, 12, 124), // สีบน
+                //     Color.fromARGB(255, 175, 110, 255), // สีล่าง
+                //   ],
+                //   begin: Alignment.topLeft,
+                //   end: Alignment.bottomRight,
+                // ),
+                color: Color.fromARGB(255, 213, 174, 255),
+                // border: Border.all(
+                //   color: Colors.black, // สีขอบ
+                //   width: 2.0, // ความหนาขอบ
+                // ),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0), // ความโค้งขอบ
+                ),
+              ),
+              padding: EdgeInsets.all(20.0), // ความห่างระหว่างขอบและเนื้อหา
+
               child: Text(
-                'เพิ่มส่วนผสม',
-                style: TextStyle(fontSize: 30, fontStyle: FontStyle.italic),
+                'ADD INGREDIENT',
+                style: TextStyle(
+                    fontSize: 30,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(147, 71, 255, 1)),
               ),
             ),
 
@@ -267,42 +294,35 @@ class _AddIGDState extends State<AddIGDPage> {
           ),
         ),
         Container(
-          height: 380,
+          height: 350,
           child: ListView.builder(
             scrollDirection: Axis.vertical,
-            itemCount: _searchResults.length + 1,
+            itemCount: _searchResults.length,
             itemBuilder: (context, index) {
-              if (index == 0) {
-                return IconButton(
-                    onPressed: () {
-                      // _refreshChoiceChips();
-                    },
-                    icon: Icon(Icons.refresh));
-              } else {
-                final result = _searchResults.reversed.toList()[index - 1];
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(width: 18.0),
-                    Chip(
-                        backgroundColor: Color.fromARGB(255, 230, 210, 255),
-                        key: ValueKey(result),
-                        label: Text(
-                          result.ingredientsName +
-                              ' ' +
-                              result.ingredientsUnits.toString() +
-                              ' ' +
-                              (ingredientsUnitsNameValues
-                                      .reverse[result.ingredientsUnitsName] ??
-                                  '') +
-                              ' ' +
-                              result.ingredientsCal.toString() +
-                              '  แคลอรี่',
-                          style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                        ))
-                  ],
-                );
-              }
+              final result = _searchResults.reversed.toList()[index];
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 18.0),
+                  Chip(
+                    backgroundColor: Color.fromARGB(255, 230, 210, 255),
+                    key: ValueKey(result),
+                    label: Text(
+                      result.ingredientsName +
+                          ' ' +
+                          result.ingredientsUnits.toString() +
+                          ' ' +
+                          (ingredientsUnitsNameValues
+                                  .reverse[result.ingredientsUnitsName] ??
+                              '') +
+                          ' ' +
+                          result.ingredientsCal.toString() +
+                          '  แคลอรี่',
+                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                    ),
+                  ),
+                ],
+              );
             },
           ),
         ),

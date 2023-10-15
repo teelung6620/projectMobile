@@ -191,14 +191,7 @@ class _AddState extends State<AddPage> {
       body: SingleChildScrollView(
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 255, 255, 255), // สีบน
-                Color.fromARGB(255, 175, 110, 255), // สีล่าง
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+            color: Color(0xff4D4C7D),
           ),
           child: Column(
             children: [

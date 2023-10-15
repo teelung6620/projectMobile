@@ -86,9 +86,9 @@ class _MyHomePageState extends State<HomePage> {
       //     child: Text('print token')),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color.fromARGB(255, 182, 150, 239),
+        backgroundColor: Color(0xFF363062),
         selectedItemColor: Colors.white,
-        unselectedItemColor: Color.fromARGB(179, 65, 34, 100),
+        unselectedItemColor: Color(0xFF8080A8),
         currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,
         type: BottomNavigationBarType.fixed,

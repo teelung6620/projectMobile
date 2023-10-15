@@ -16,12 +16,13 @@ class InputTextFieldWidget extends StatelessWidget {
         decoration: InputDecoration(
             alignLabelWithHint: true,
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.black)),
-            fillColor: Colors.white54,
+                borderSide: BorderSide(
+                    color: const Color.fromARGB(255, 255, 255, 255))),
+            fillColor: Color.fromARGB(255, 255, 255, 255),
             hintText: hintText,
-            hintStyle: TextStyle(color: Color.fromARGB(255, 180, 143, 209)),
+            hintStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
             contentPadding: EdgeInsets.all(15),
-            focusColor: Colors.white60,
+            focusColor: Color.fromARGB(255, 255, 255, 255),
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(10))),
       ),

@@ -193,295 +193,318 @@ class _ListState extends State<ListPage> {
         //backgroundColor: Color.fromARGB(255, 245, 238, 255),
         body: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 255, 255, 255), // สีบน
-                Color.fromARGB(255, 175, 110, 255), // สีล่าง
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+            color: Color(0xff4D4C7D), // สีบน,
           ),
           child: Column(
             children: [
-              Row(
-                children: [
-                  // LogoutButton(
-                  //   onPressed:
-                  //   title: 'Log out',
-                  // ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        Logout();
-                      },
-                      icon: Icon(
-                        Icons.logout,
-                        size: 35,
-                      )),
-                  Spacer(),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Color.fromARGB(255, 191, 159, 255),
-                        width: 5,
-                      ),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30.0),
-                        //bottomLeft: Radius.circular(10.0)
-                      ),
-                      color: Color.fromARGB(255, 191, 159, 255),
-                    ),
-                    padding: EdgeInsets.all(2),
-                    child: Row(
+              Container(
+                decoration: BoxDecoration(
+                  color: Color(0xff363062),
+                ),
+                child: Column(
+                  children: [
+                    Row(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              '$userName',
-                              style: TextStyle(
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                              '$userEmail',
-                              style: TextStyle(fontStyle: FontStyle.italic),
-                            ),
-                          ],
-                        ),
+                        // LogoutButton(
+                        //   onPressed:
+                        //   title: 'Log out',
+                        // ),
                         SizedBox(
                           width: 10,
                         ),
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(
-                            'http://10.0.2.2:4000/uploadPostImage/${userImage}',
+                        IconButton(
+                            onPressed: () {
+                              Logout();
+                            },
+                            icon: Icon(
+                              Icons.logout,
+                              size: 35,
+                              color: Colors.white,
+                            )),
+                        Spacer(),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Color.fromARGB(255, 191, 159, 255),
+                              width: 5,
+                            ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30.0),
+                              //bottomLeft: Radius.circular(10.0)
+                            ),
+                            color: Color.fromARGB(255, 191, 159, 255),
+                          ),
+                          padding: EdgeInsets.all(2),
+                          child: Row(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    '$userName',
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                  Text(
+                                    '$userEmail',
+                                    style:
+                                        TextStyle(fontStyle: FontStyle.italic),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundImage: userImage != null
+                                    ? NetworkImage(
+                                        'http://10.0.2.2:4000/uploadPostImage/$userImage',
+                                      )
+                                    : NetworkImage(
+                                        'http://10.0.2.2:4000/uploadPostImage/coke.jpg'), // รูปภาพสำรอง
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color.fromARGB(255, 255, 255, 255),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.black,
+                          ),
+                          hintText: 'Enter a search term',
+                          contentPadding: EdgeInsets.only(
+                            left: 15.0,
+                          ),
+                        ),
+                        onChanged: (query) {
+                          setState(() {
+                            newPosts = posts
+                                .where((result) => result.postName
+                                    .toLowerCase()
+                                    .contains(query.toLowerCase()))
+                                .toList();
+                            _searchResults = IGDResults.where((result) => result
+                                .ingredientsName
+                                .toLowerCase()
+                                .contains(query.toLowerCase())).toList();
+                          });
+                        },
+                        controller: _searchController,
+                        style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                      ),
+                    ),
+                    Container(
+                      height: 35,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _searchResults.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return IconButton(
+                              onPressed: () {
+                                _refreshChoiceChips();
+                              },
+                              icon: Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                              ),
+                            );
+                          } else {
+                            final result = _searchResults[index - 1];
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                SizedBox(width: 18.0),
+                                ChoiceChip(
+                                  backgroundColor: Color(0xFF4D4C7D),
+                                  key: ValueKey(result),
+                                  label: Text(
+                                    result.ingredientsName,
+                                    style: TextStyle(
+                                        color:
+                                            Color.fromARGB(255, 255, 255, 255)),
+                                  ),
+                                  selected: selectedChips
+                                      .contains(result.ingredientsName),
+                                  onSelected: (selected) {
+                                    setState(() {
+                                      if (selected) {
+                                        selectedChips
+                                            .add(result.ingredientsName);
+                                        _selectedIngredients.add(
+                                            result); // ตรวจสอบการเพิ่ม ChoiceChip ลงใน _selectedIngredients
+                                      } else {
+                                        selectedChips
+                                            .remove(result.ingredientsName);
+                                        _selectedIngredients.remove(
+                                            result); // ตรวจสอบการลบ ChoiceChip ออกจาก _selectedIngredients
+                                      }
+                                      updateposts();
+                                    });
+                                  },
+                                )
+                              ],
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(height: 5.0),
+                        const SizedBox(width: 18.0),
+                        Text(
+                          'TYPES',
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
                         ),
                         SizedBox(
-                          width: 10,
+                          width: 5.0,
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 255, 255, 255),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.black,
-                    ),
-                    hintText: 'Enter a search term',
-                    contentPadding: EdgeInsets.only(
-                      left: 15.0,
-                    ),
-                  ),
-                  onChanged: (query) {
-                    setState(() {
-                      newPosts = posts
-                          .where((result) => result.postName
-                              .toLowerCase()
-                              .contains(query.toLowerCase()))
-                          .toList();
-                      _searchResults = IGDResults.where((result) => result
-                          .ingredientsName
-                          .toLowerCase()
-                          .contains(query.toLowerCase())).toList();
-                    });
-                  },
-                  controller: _searchController,
-                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-                ),
-              ),
-              Container(
-                height: 35,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _searchResults.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return IconButton(
-                        onPressed: () {
-                          _refreshChoiceChips();
-                        },
-                        icon: Icon(Icons.refresh),
-                      );
-                    } else {
-                      final result = _searchResults[index - 1];
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          SizedBox(width: 18.0),
-                          ChoiceChip(
-                            backgroundColor: Color.fromARGB(255, 230, 210, 255),
-                            key: ValueKey(result),
-                            label: Text(
-                              result.ingredientsName,
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 0, 0, 0)),
+                        Wrap(
+                          children: [
+                            FilterChip(
+                              label: Text('food'),
+                              selected: selectedChips.contains('food'),
+                              onSelected: (_) => _toggleChip('food'),
+                              selectedColor: Color(0xFFF99417),
+                              backgroundColor: Colors.white,
                             ),
-                            selected:
-                                selectedChips.contains(result.ingredientsName),
-                            onSelected: (selected) {
-                              setState(() {
-                                if (selected) {
-                                  selectedChips.add(result.ingredientsName);
-                                  _selectedIngredients.add(
-                                      result); // ตรวจสอบการเพิ่ม ChoiceChip ลงใน _selectedIngredients
-                                } else {
-                                  selectedChips.remove(result.ingredientsName);
-                                  _selectedIngredients.remove(
-                                      result); // ตรวจสอบการลบ ChoiceChip ออกจาก _selectedIngredients
-                                }
-                                updateposts();
-                              });
-                            },
-                          )
-                        ],
-                      );
-                    }
-                  },
-                ),
-              ),
-              Row(
-                children: [
-                  const SizedBox(height: 5.0),
-                  const SizedBox(width: 18.0),
-                  Text(
-                    'filters',
-                    style: textTheme.labelLarge,
-                  ),
-                  SizedBox(
-                    width: 5.0,
-                  ),
-                  Wrap(
-                    children: [
-                      FilterChip(
-                        label: Text('food'),
-                        selected: selectedChips.contains('food'),
-                        onSelected: (_) => _toggleChip('food'),
-                        selectedColor: Color.fromARGB(255, 214, 165, 255),
-                        backgroundColor: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 5.0,
-                      ),
-                      FilterChip(
-                        label: Text('sweet'),
-                        selected: selectedChips.contains('sweet'),
-                        onSelected: (_) => _toggleChip('sweet'),
-                        selectedColor: Color.fromARGB(255, 214, 165, 255),
-                        backgroundColor: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 5.0,
-                      ),
-                      FilterChip(
-                        label: Text('drink'),
-                        selected: selectedChips.contains('drink'),
-                        onSelected: (_) => _toggleChip('drink'),
-                        selectedColor: Color.fromARGB(255, 214, 165, 255),
-                        backgroundColor: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 5.0,
-                      ),
-                      // เพิ่ม Filter Chip
-                    ],
-                  ),
-
-                  // Rest of your code...
-                ],
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: 20.0,
-                  ),
-                  SizedBox(
-                    width: 70,
-                    height: 30,
-                    child: TextField(
-                      // For filtering by calories
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5.0),
+                            SizedBox(
+                              width: 5.0,
+                            ),
+                            FilterChip(
+                              label: Text('sweet'),
+                              selected: selectedChips.contains('sweet'),
+                              onSelected: (_) => _toggleChip('sweet'),
+                              selectedColor: Color.fromARGB(255, 247, 154, 255),
+                              backgroundColor: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 5.0,
+                            ),
+                            FilterChip(
+                              label: Text('drink'),
+                              selected: selectedChips.contains('drink'),
+                              onSelected: (_) => _toggleChip('drink'),
+                              selectedColor: Color.fromARGB(255, 109, 245, 255),
+                              backgroundColor: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 5.0,
+                            ),
+                            // เพิ่ม Filter Chip
+                          ],
                         ),
-                        // hintText: 'enter  ',
-                        contentPadding: EdgeInsets.only(right: 5.0),
-                      ),
-                      textAlign: TextAlign.right,
-                      onChanged: (query) {
-                        if (int.tryParse(query) != null) {
-                          setState(() {
-                            newPosts = posts
-                                .where((result) =>
-                                    result.totalCal == null ||
-                                    result.totalCal! <= int.parse(query))
-                                .toList();
-                          });
-                        } else {
-                          setState(() {
-                            newPosts = posts;
-                          });
-                        }
-                      },
-                      keyboardType: TextInputType.number,
-                      controller: _caloriesController,
-                      style: TextStyle(color: Colors.black, fontSize: 20),
-                      //textAlign: TextAlign.left,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(
-                            5), // จำกัดจำนวนตัวเลขให้มีไม่เกิน 4 หลัก
+
+                        // Rest of your code...
                       ],
                     ),
-                  ),
-                  Text(
-                    '  KCAL',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 5.0,
-              ),
-              Visibility(
-                visible: _selectedIngredients.isNotEmpty,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Wrap(
-                    children: _selectedIngredients.map((selectedIngredient) {
-                      return Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Chip(
-                          label: Text(selectedIngredient.ingredientsName),
-                          onDeleted: () {
-                            setState(() {
-                              _onIngredientRemoved(selectedIngredient);
-                              selectedChips.remove(selectedIngredient
-                                  .ingredientsName); // ลบชื่ออาหารออกจาก selectedChips
-                              updateposts();
-                            });
-                          },
-                          backgroundColor: Color.fromARGB(255, 229, 156, 255),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 20.0,
                         ),
-                      );
-                    }).toList(),
-                  ),
+                        SizedBox(
+                          width: 70,
+                          height: 30,
+                          child: TextField(
+                            // For filtering by calories
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5.0),
+                              ),
+                              // hintText: 'enter  ',
+                              contentPadding: EdgeInsets.only(right: 5.0),
+                            ),
+                            textAlign: TextAlign.right,
+                            onChanged: (query) {
+                              if (int.tryParse(query) != null) {
+                                setState(() {
+                                  newPosts = posts
+                                      .where((result) =>
+                                          result.totalCal == null ||
+                                          result.totalCal <= int.parse(query))
+                                      .toList();
+                                });
+                              } else {
+                                setState(() {
+                                  newPosts = posts;
+                                });
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            controller: _caloriesController,
+                            style: TextStyle(color: Colors.black, fontSize: 20),
+                            //textAlign: TextAlign.left,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(
+                                  5), // จำกัดจำนวนตัวเลขให้มีไม่เกิน 4 หลัก
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '  KCAL',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    Visibility(
+                      visible: _selectedIngredients.isNotEmpty,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Wrap(
+                          children:
+                              _selectedIngredients.map((selectedIngredient) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Chip(
+                                label: Text(
+                                  selectedIngredient.ingredientsName,
+                                  style: TextStyle(color: Color(0xFF363062)),
+                                ),
+                                onDeleted: () {
+                                  setState(() {
+                                    _onIngredientRemoved(selectedIngredient);
+                                    selectedChips.remove(selectedIngredient
+                                        .ingredientsName); // ลบชื่ออาหารออกจาก selectedChips
+                                    updateposts();
+                                  });
+                                },
+                                backgroundColor:
+                                    Color.fromARGB(255, 255, 255, 255),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
@@ -513,8 +536,9 @@ class _ListState extends State<ListPage> {
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
                                     ),
-                                    onPressed: () {
-                                      Navigator.push(
+                                    onPressed: () async {
+                                      final shouldRefreshData =
+                                          await Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => DetailPage(
@@ -523,6 +547,10 @@ class _ListState extends State<ListPage> {
                                           ),
                                         ),
                                       );
+
+                                      if (shouldRefreshData == true) {
+                                        await getPost();
+                                      }
                                     },
                                     child: Column(
                                       children: [

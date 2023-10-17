@@ -117,16 +117,79 @@ class PostController extends GetxController {
       final response = await http.Response.fromStream(await request.send());
 
       if (response.statusCode == 200) {
-        final responseData = response.body;
-        final json = jsonDecode(responseData);
+        // ลบบุ๊กมาร์คสำเร็จ
+        // คุณสามารถทำการอัพเดท UI หรือแอปของคุณตามที่ต้องการ
+        print('Deleted successfully');
+      } else {
+        // ไม่สามารถลบบุ๊กมาร์คได้
+        // คุณสามารถจัดการกับข้อผิดพลาดได้ตามที่คุณต้องการ
+        print('Failed to delete');
+      }
+    } catch (e) {
+      // ดักจับข้อผิดพลาด
+      print('Error: $e');
+    }
+  }
 
-        if (json['status'] == 'ok') {
-          // ลบโพสต์สำเร็จ
-          // คุณสามารถทำการอัพเดท UI หรือแอปของคุณตามที่ต้องการ
-        } else {
-          // ไม่สามารถลบโพสต์ได้
-          // คุณสามารถจัดการกับข้อผิดพลาดได้ตามที่คุณต้องการ
-        }
+  Future<void> updatePost(
+    int postId, {
+    String? name,
+    String? description,
+    String? type,
+    String? image,
+    String? ingredientsId,
+    List<int>? selectedUnits,
+  }) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      String userId = jwtDecodedToken['user_id'].toString();
+
+      var headers = {'Content-Type': 'application/json'};
+
+      // ส่งคำขอ PATCH ไปยังเซิร์ฟเวอร์เพื่ออัปเดตโพสต์
+      var url = Uri.parse(
+          "${ApiEndPoints.baseUrl}${ApiEndPoints.authEndpoints.patchPOST}/$postId");
+
+      Map<String, dynamic> body = {
+        'user_id': userId,
+        'post_id': postId,
+      };
+
+      if (name != null) {
+        body['post_name'] = name;
+      }
+      if (description != null) {
+        body['post_description'] = description;
+      }
+      if (type != null) {
+        body['post_types'] = type;
+      }
+      if (image != null) {
+        body['post_image'] = image;
+      }
+      if (ingredientsId != null) {
+        body['ingredients_id'] = ingredientsId;
+      }
+      if (selectedUnits != null) {
+        body['ingredients_unit'] = selectedUnits.toString();
+      }
+
+      final request = http.Request('PATCH', url);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(body);
+
+      final response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        // อัปเดตโพสต์สำเร็จ
+        // คุณสามารถทำการอัพเดท UI หรือแอปของคุณตามที่ต้องการ
+        print('Updated successfully');
+      } else {
+        // ไม่สามารถอัปเดตโพสต์ได้
+        // คุณสามารถจัดการกับข้อผิดพลาดได้ตามที่คุณต้องการ
+        print('Failed to update');
       }
     } catch (e) {
       // ดักจับข้อผิดพลาด

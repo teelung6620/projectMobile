@@ -8,6 +8,7 @@ import '../components/logoutButton.dart';
 import '../components/submitButton.dart';
 import '../constant/constants.dart';
 import '../controller/bookmarkController.dart';
+import '../controller/post_controller.dart';
 import '../model/Ingredients.list.dart';
 import '../model/post.dart';
 import '../model/userPost.dart';
@@ -46,6 +47,7 @@ class _ListState extends State<ListPage> {
   String? userName;
   String? userEmail;
   String? userImage;
+  String? userType;
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -60,10 +62,12 @@ class _ListState extends State<ListPage> {
       userName = decodedToken['user_name'];
       userEmail = decodedToken['user_email'];
       userImage = decodedToken['user_image'];
+      userType = decodedToken['user_type'];
       print(userId);
       print(userName);
       print(userEmail);
       print(userImage);
+      print(userType);
 
       // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
       // await getBookmark();
@@ -169,6 +173,42 @@ class _ListState extends State<ListPage> {
   Future<void> fetchPosts() async {
     await getPost();
     // เรียกใช้เมื่อต้องการดึงข้อมูลโพสต์
+  }
+
+  Future _showDeleteConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('ยืนยันการลบ Bookmark'),
+          content: Text('คุณต้องการลบ Bookmark นี้ ใช่หรือไม่?'),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ยกเลิกการลบ
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true); // ยืนยันการลบ
+              },
+              child: Text('ยืนยัน'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -676,34 +716,81 @@ class _ListState extends State<ListPage> {
                                               ),
                                             ),
                                             Spacer(),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                await BookmarkController()
-                                                    .BookmarkUser(
-                                                  newPosts[reverseindex].postId,
-                                                );
-                                                // await getBookmark();
-                                                // setState(() {
-                                                //   getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
-                                                //   //getBookmark();
-                                                // });
-                                                Get.snackbar(
-                                                  'สำเร็จ',
-                                                  'เพิ่มลง Bookmarks ของคุณแล้ว',
-                                                  snackPosition:
-                                                      SnackPosition.TOP,
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                              ),
-                                              child: Icon(
-                                                Icons.bookmark_add_sharp,
-                                                color: Color.fromARGB(
-                                                    255, 215, 158, 255),
-                                              ),
+                                            Column(
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    await BookmarkController()
+                                                        .BookmarkUser(
+                                                      newPosts[reverseindex]
+                                                          .postId,
+                                                    );
+                                                    // await getBookmark();
+                                                    // setState(() {
+                                                    //   getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
+                                                    //   //getBookmark();
+                                                    // });
+                                                    Get.snackbar(
+                                                      'สำเร็จ',
+                                                      'เพิ่มลง Bookmarks ของคุณแล้ว',
+                                                      snackPosition:
+                                                          SnackPosition.TOP,
+                                                    );
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            255, 255, 255, 255),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.bookmark_add_sharp,
+                                                    color: Color(0xFF363062),
+                                                  ),
+                                                ),
+                                                Visibility(
+                                                  visible: userType == "admin",
+                                                  child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      if (userType == "admin") {
+                                                        // ตรวจสอบว่า user_type เป็น "admin" หรือไม่
+                                                        bool confirmDelete =
+                                                            await _showDeleteConfirmationDialog();
+                                                        if (confirmDelete) {
+                                                          await PostController()
+                                                              .deletePost(posts[
+                                                                      reverseindex]
+                                                                  .postId);
+                                                          setState(() {
+                                                            getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
+                                                          });
+                                                          Get.snackbar(
+                                                            'สำเร็จ',
+                                                            'ลบโพสน์ของ ${posts[reverseindex].userName} แล้ว',
+                                                            snackPosition:
+                                                                SnackPosition
+                                                                    .TOP,
+                                                          );
+                                                        }
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              255),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons
+                                                          .delete_forever_sharp,
+                                                      color: Color(0xFF363062),
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
                                             ),
                                           ],
                                         ),

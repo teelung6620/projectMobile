@@ -24,9 +24,10 @@ class MyApp extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  bool isAdmin() {
+  bool isAdmin(String token) {
     final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     final userType = decodedToken['user_type'];
+    print(userType);
     return userType == 'admin';
   }
 
@@ -34,13 +35,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+
       // home: const LoginPage(),
       home: (token != null && JwtDecoder.isExpired(token!) == false)
-          ? (isAdmin() ? AdminPage(token: token!) : HomePage(token: token!))
+          ? (isAdmin(token)
+              ? AdminPage(token: token!)
+              : HomePage(token: token!))
           : LoginScreen(),
 
       // home: AuthScreen(token: token),

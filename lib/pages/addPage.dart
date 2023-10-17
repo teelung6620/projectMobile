@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
+import 'package:project_mobile/model/user.dart';
 
 import 'package:project_mobile/pages/ListPage.dart';
 import 'package:project_mobile/pages/homeTest.dart';
@@ -30,7 +31,8 @@ class AddPage extends StatefulWidget {
 
 class _AddState extends State<AddPage> {
   PostController postController = Get.put(PostController());
-  late int user_id;
+  int? user_id;
+  int? banned;
   TextEditingController _searchController = TextEditingController();
   List<IngredientList> _searchResults = [];
   List<IngredientList> IGDResults = [];
@@ -41,9 +43,64 @@ class _AddState extends State<AddPage> {
   TextEditingController unitController = TextEditingController();
   List<String> typeOptions = ['food', 'sweet', 'drink'];
   String _selectedItem = 'food';
+  List<User> UserResults = [];
 
   XFile? image;
   final picker = ImagePicker();
+
+  _getSavedToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+    print(token);
+
+    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+
+    user_id = jwtDecodedToken['user_id'];
+    banned = jwtDecodedToken['banned'];
+    print(user_id);
+    print(banned);
+  }
+
+  Future<void> _checkUserStatus() async {
+    // เรียก API หรือดึงข้อมูลผู้ใช้เพื่อตรวจสอบสถานะ banned
+    // ตรวจสอบสถานะ banned ของผู้ใช้โดยใช้ค่าที่ได้จาก API หรือข้อมูลผู้ใช้
+
+    var url = Uri.parse("http://10.0.2.2:4000/login");
+    var response = await http.get(url);
+    List<User> userResults = userFromJson(response.body);
+
+    if (userResults.isNotEmpty) {
+      bool isBanned = banned == 1; // เช็คว่า banned เป็น 1 หรือไม่
+
+      if (isBanned) {
+        // ถ้าผู้ใช้ถูกแบน
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              title: Text('แจ้งเตือน'),
+              content: Text('คุณถูกแบนและไม่สามารถใช้หน้านี้ได้'),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text('OK'),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      Color.fromARGB(255, 103, 23, 173),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    //Navigator.pop(context, '/ListPage');
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
 
   Future getIGD() async {
     var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
@@ -64,6 +121,10 @@ class _AddState extends State<AddPage> {
     super.initState();
     getIGD();
     _selectedItem;
+
+    // เรียกฟังก์ชัน _checkUserStatus สำหรับตรวจสอบสถานะ banned
+    _checkUserStatus();
+    _getSavedToken();
   }
 
   _onSearchChanged() {
@@ -142,16 +203,16 @@ class _AddState extends State<AddPage> {
     postController.postMenuUser(image!.path, _selectedUnits);
   }
 
-  _getSavedToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString("token");
-    print(token);
+  // _getSavedToken() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? token = prefs.getString("token");
+  //   print(token);
 
-    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+  //   Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
 
-    user_id = jwtDecodedToken['user_id'];
-    print(user_id);
-  }
+  //   user_id = jwtDecodedToken['user_id'];
+  //   print(user_id);
+  // }
 
   Future<void> chooseImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -195,7 +256,22 @@ class _AddState extends State<AddPage> {
           ),
           child: Column(
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
+              Visibility(
+                  visible: banned == 1,
+                  child: Column(
+                    children: [
+                      Text(
+                        'คุณถูกแบน',
+                        style: TextStyle(fontSize: 20, color: Colors.red),
+                      ),
+                      Text(
+                        'คุณไม่สามารถเผยแพร่เมนูอาหารได้',
+                        style: TextStyle(fontSize: 15, color: Colors.red),
+                      ),
+                    ],
+                  )),
+              const SizedBox(height: 30),
               // MyTextField2(
               //     controller: postnameController,
               //     hintText: 'name',
@@ -211,11 +287,14 @@ class _AddState extends State<AddPage> {
 
               //_buildSearchResults(),
 
-              SubmitButton(
-                onPressed: () {
-                  submitPost();
-                },
-                title: 'CREATE',
+              Visibility(
+                visible: banned == 0,
+                child: SubmitButton(
+                  onPressed: () {
+                    submitPost();
+                  },
+                  title: 'CREATE',
+                ),
               ),
             ],
           ),

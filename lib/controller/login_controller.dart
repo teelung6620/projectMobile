@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:project_mobile/pages/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../pages/ADMINpages/adminPage.dart';
 import '../pages/homeTest.dart';
 import '../utils/api_endpoint.dart';
 
@@ -30,7 +31,7 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
-        if (json['status'] == 'ok') {
+        if (json['status'] == 'ok_user') {
           var token = json['token'];
 
           final SharedPreferences? prefs = await _prefs;
@@ -39,6 +40,17 @@ class LoginController extends GetxController {
           emailController.clear();
           passwordController.clear();
           Get.off(HomePage(
+            token: token,
+          ));
+        } else if (json['status'] == 'ok_admin') {
+          var token = json['token'];
+
+          final SharedPreferences? prefs = await _prefs;
+          await prefs?.setString('token', token);
+
+          emailController.clear();
+          passwordController.clear();
+          Get.off(AdminPage(
             token: token,
           ));
         } else if (json['status'] == 'error') {

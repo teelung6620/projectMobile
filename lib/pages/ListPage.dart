@@ -265,14 +265,14 @@ class _ListState extends State<ListPage> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Color.fromARGB(255, 191, 159, 255),
+                              color: Color(0xFFF99417),
                               width: 5,
                             ),
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(30.0),
                               //bottomLeft: Radius.circular(10.0)
                             ),
-                            color: Color.fromARGB(255, 191, 159, 255),
+                            color: Color(0xFFF99417),
                           ),
                           padding: EdgeInsets.all(2),
                           child: Row(
@@ -567,7 +567,7 @@ class _ListState extends State<ListPage> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 width: 20,
-                                height: 130,
+                                height: 150,
                                 decoration: BoxDecoration(
                                   color: Color.fromARGB(255, 255, 255, 255),
                                   borderRadius: BorderRadius.circular(8),
@@ -688,8 +688,8 @@ class _ListState extends State<ListPage> {
                                                   Container(
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
-                                                        color: Color.fromARGB(
-                                                            255, 179, 140, 255),
+                                                        color:
+                                                            Color(0xFF363062),
                                                         width: 2,
                                                       ),
                                                       borderRadius:
@@ -703,11 +703,8 @@ class _ListState extends State<ListPage> {
                                                       newPosts[reverseindex]
                                                           .userName,
                                                       style: TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              138,
-                                                              80,
-                                                              255),
+                                                          color:
+                                                              Color(0xFF4D4C7D),
                                                           fontSize: 15),
                                                       textAlign: TextAlign.left,
                                                     ),
@@ -745,6 +742,32 @@ class _ListState extends State<ListPage> {
                                                   ),
                                                   child: Icon(
                                                     Icons.bookmark_add_sharp,
+                                                    color: Color(0xFF363062),
+                                                  ),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    await PostController()
+                                                        .ReportPost(
+                                                      newPosts[reverseindex]
+                                                          .postId,
+                                                    );
+
+                                                    Get.snackbar(
+                                                      'Report สำเร็จ',
+                                                      'ระบบได้ส่งคำร้องของคุณแล้ว',
+                                                      snackPosition:
+                                                          SnackPosition.TOP,
+                                                    );
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            255, 255, 255, 255),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.report,
                                                     color: Color(0xFF363062),
                                                   ),
                                                 ),

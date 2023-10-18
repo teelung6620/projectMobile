@@ -6,42 +6,38 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/BookMark.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
+import 'package:project_mobile/model/Report.list.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../components/input_textfield.dart';
-import '../components/input_textfieldmultiple.dart';
-import '../components/my_textfield.dart';
-import '../components/my_textfield2.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-import '../components/submitButton.dart';
-import '../controller/registeration_controller.dart';
-import '../model/userPost.dart';
-import 'detail_page.dart';
+import '../../model/userPost.dart';
+import '../detail_page.dart';
 
-class YourPages extends StatefulWidget {
-  YourPages({Key? key}) : super(key: key);
+class ReportPage extends StatefulWidget {
+  ReportPage({Key? key}) : super(key: key);
   @override
-  State<YourPages> createState() => _YourState();
+  State<ReportPage> createState() => _ReportState();
 }
 
-class _YourState extends State<YourPages> {
+class _ReportState extends State<ReportPage> {
   List<UserPost> posts = [];
   List imagesUrl = [];
-  List<BookMark> bookmark = [];
+  List<ReportList> report = [];
   int? userId;
+  int? postId;
 
-  Future getBookmark() async {
-    var url = Uri.parse("http://10.0.2.2:4000/bookmarks");
+  Future getReport() async {
+    var url = Uri.parse("http://10.0.2.2:4000/reports");
     var response = await http.get(url);
-    bookmark = bookMarkFromJson(response.body);
+    report = reportListFromJson(response.body);
 
     // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId
-    bookmark = bookmark.where((element) => element.userId == userId).toList();
+    // report = report.where((element) => element.userId == userId).toList();
   }
 
   Future getPost() async {
@@ -50,8 +46,11 @@ class _YourState extends State<YourPages> {
     posts = userPostFromJson(response.body);
 
     setState(() {
-      // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId
-      posts = posts.where((element) => element.userId == userId).toList();
+      // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId และ postId ตรงกับ bookmark
+      posts = posts
+          .where((element) =>
+              report.any((reportItem) => reportItem.postId == element.postId))
+          .toList();
 
       posts.forEach((element) {
         imagesUrl.add(element.postImage);
@@ -64,9 +63,11 @@ class _YourState extends State<YourPages> {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       userId = int.tryParse(decodedToken['user_id'].toString());
 
+      print(userId);
+
       // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
-      await getBookmark();
-      await getPost();
+      // await getBookmark();
+      // await getPost();
     } catch (error) {
       print('Error decoding token: $error');
     }
@@ -77,8 +78,8 @@ class _YourState extends State<YourPages> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('ยืนยันการลบโพสน์'),
-          content: Text('คุณต้องการลบโพสน์นี้ ใช่หรือไม่?'),
+          title: Text('ยืนยันการลบ Bookmark'),
+          content: Text('คุณต้องการลบ Bookmark นี้ ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -111,7 +112,7 @@ class _YourState extends State<YourPages> {
   @override
   void initState() {
     super.initState();
-    getBookmark();
+    getReport();
     getPost();
 
     SharedPreferences.getInstance().then((prefs) {
@@ -126,7 +127,7 @@ class _YourState extends State<YourPages> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        //backgroundColor: Color.fromARGB(255, 245, 238, 255),
+        // backgroundColor: Color.fromARGB(255, 245, 238, 255),
         body: Container(
           decoration: BoxDecoration(color: Color(0xFF4D4C7D)),
           child: Column(
@@ -156,7 +157,7 @@ class _YourState extends State<YourPages> {
                 padding: EdgeInsets.all(20.0), // ความห่างระหว่างขอบและเนื้อหา
 
                 child: Text(
-                  'YOUR MENU',
+                  'REPORT LIST',
                   style: TextStyle(
                       fontSize: 30,
                       fontStyle: FontStyle.italic,
@@ -316,7 +317,7 @@ class _YourState extends State<YourPages> {
                                                           .userName,
                                                       style: TextStyle(
                                                           color:
-                                                              Color(0xFF4D4C7D),
+                                                              Color(0xFF363062),
                                                           fontSize: 15),
                                                       textAlign: TextAlign.left,
                                                     ),
@@ -331,10 +332,14 @@ class _YourState extends State<YourPages> {
                                                     await _showDeleteConfirmationDialog();
                                                 if (confirmDelete) {
                                                   await PostController()
-                                                      .deletePost(
-                                                    posts[reverseindex].postId,
+                                                      .deleteReport(
+                                                    postId: posts[reverseindex]
+                                                        .postId,
+                                                    reportId:
+                                                        report[reverseindex]
+                                                            .reportId,
                                                   );
-
+                                                  await getReport();
                                                   setState(() {
                                                     getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
                                                   });
@@ -346,60 +351,14 @@ class _YourState extends State<YourPages> {
                                                         255, 255, 255, 255),
                                               ),
                                               child: Icon(
-                                                Icons.delete_forever_sharp,
+                                                Icons.report_off_sharp,
                                                 color: Color(0xFF363062),
                                               ),
-                                            ),
+                                            )
                                           ],
                                         ),
                                       ],
-                                    )
-
-                                    // Align(
-                                    //   child: ListTile(
-                                    //     subtitleTextStyle: const TextStyle(
-                                    //       fontSize: 20,
-                                    //       fontWeight: FontWeight.normal,
-                                    //     ),
-                                    //     titleTextStyle: const TextStyle(
-                                    //       color: Colors.black,
-                                    //       fontSize: 25,
-                                    //       fontWeight: FontWeight.normal,
-                                    //     ),
-                                    //     leading: Expanded(
-                                    //       child: Image(
-                                    //         image: NetworkImage(
-                                    //           'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //     title: Text(
-                                    //       newPosts[reverseindex].postName,
-                                    //       textAlign: TextAlign.left,
-                                    //     ),
-                                    //     subtitle: Text(
-                                    //       newPosts[reverseindex].userName,
-                                    //       textAlign: TextAlign.left,
-                                    //     ),
-                                    //     trailing: Container(
-                                    //       width:
-                                    //           100, // ปรับความกว้างของช่องแสดง totalCal ตามที่คุณต้องการ
-                                    //       alignment: Alignment
-                                    //           .centerRight, // จัดตำแหน่งข้อความที่ด้านขวา
-                                    //       child: newPosts[reverseindex].totalCal !=
-                                    //               null
-                                    //           ? Text(
-                                    //               "${newPosts[reverseindex].totalCal}",
-                                    //               style: TextStyle(
-                                    //                 fontSize: 18,
-                                    //                 fontWeight: FontWeight.bold,
-                                    //               ),
-                                    //             )
-                                    //           : SizedBox(),
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    ),
+                                    )),
                               ),
                             );
                           },

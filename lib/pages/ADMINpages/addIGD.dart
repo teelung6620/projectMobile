@@ -54,7 +54,7 @@ class _AddIGDState extends State<AddIGDPage> {
     return SafeArea(
         child: Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 245, 238, 255),
+      backgroundColor: Color(0xFF4D4C7D),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -72,7 +72,7 @@ class _AddIGDState extends State<AddIGDPage> {
                 //   begin: Alignment.topLeft,
                 //   end: Alignment.bottomRight,
                 // ),
-                color: Color.fromARGB(255, 213, 174, 255),
+                color: Color(0xFF363062),
                 // border: Border.all(
                 //   color: Colors.black, // สีขอบ
                 //   width: 2.0, // ความหนาขอบ
@@ -89,7 +89,7 @@ class _AddIGDState extends State<AddIGDPage> {
                     fontSize: 30,
                     fontStyle: FontStyle.italic,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(147, 71, 255, 1)),
+                    color: Color(0xFFF5F5F5)),
               ),
             ),
 
@@ -150,7 +150,7 @@ class _AddIGDState extends State<AddIGDPage> {
             ),
             Text(
               'ปริมาณ : ',
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18, color: Color(0xFFF5F5F5)),
             ),
             Center(
               child: SizedBox(
@@ -186,15 +186,15 @@ class _AddIGDState extends State<AddIGDPage> {
             //     child: InputTextFieldWidget(
             //         igdController.unitNameController, 'หน่วย')),
             Container(
-              height: 25,
+              height: 30,
               decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 206, 167, 255),
+                  color: Color(0xFF363062),
                   borderRadius: BorderRadius.circular(10)),
               child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: DropdownButton(
                     value: _selectedItem,
-                    dropdownColor: Color.fromARGB(255, 206, 167, 255),
+                    dropdownColor: Color(0xFF363062),
                     style: TextStyle(color: Colors.white, fontSize: 15),
                     iconEnabledColor: Colors.white,
                     items: unitNameOptions.map((String option) {
@@ -223,7 +223,7 @@ class _AddIGDState extends State<AddIGDPage> {
             ),
             Text(
               'แคลอรี่ : ',
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 18, color: Color(0xFFF5F5F5)),
             ),
             Center(
               child: SizedBox(
@@ -305,7 +305,7 @@ class _AddIGDState extends State<AddIGDPage> {
                 children: [
                   SizedBox(width: 18.0),
                   Chip(
-                    backgroundColor: Color.fromARGB(255, 230, 210, 255),
+                    backgroundColor: Color(0xFF363062),
                     key: ValueKey(result),
                     label: Text(
                       result.ingredientsName +
@@ -318,7 +318,8 @@ class _AddIGDState extends State<AddIGDPage> {
                           ' ' +
                           result.ingredientsCal.toString() +
                           '  แคลอรี่',
-                      style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
                     ),
                   ),
                 ],

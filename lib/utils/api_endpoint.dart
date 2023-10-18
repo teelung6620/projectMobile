@@ -14,4 +14,6 @@ class _AuthEndPoints {
   final String DELPost = '/DELpost_data';
   final String scoreAdd = '/scores';
   final String patchPOST = '/update_post_data';
+  final String reportPOST = '/reports';
+  final String DELreportPost = '/DELreports';
 }

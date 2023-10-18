@@ -23,7 +23,8 @@ class PostController extends GetxController {
   TextEditingController IGDController = TextEditingController();
   List<IngredientList> ingredientsIdList = [];
 
-  late String user_id;
+  late int user_id;
+  late int post_id;
 
   Future<void> postMenuUser(String imagePath, List<int> _selectedUnits) async {
     try {
@@ -32,7 +33,7 @@ class PostController extends GetxController {
       //print(token);
 
       Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
-      user_id = jwtDecodedToken['user_id'].toString();
+      user_id = jwtDecodedToken['user_id'];
 
       var headers = {'Content-Type': 'application/json'};
       var request = http.MultipartRequest(
@@ -57,7 +58,7 @@ class PostController extends GetxController {
       request.fields['ingredients_id'] = IGDController
           .text; // ถ้า IGDController มีข้อมูลเกี่ยวกับ ingredients_id
       request.fields['user_id'] =
-          user_id; // เพิ่ม user_id ที่ดึงมาจาก SharedPreferences
+          user_id.toString(); // เพิ่ม user_id ที่ดึงมาจาก SharedPreferences
       request.fields['ingredients_unit'] = _selectedUnits.toString();
 
       // ส่งคำขอ
@@ -190,6 +191,91 @@ class PostController extends GetxController {
         // ไม่สามารถอัปเดตโพสต์ได้
         // คุณสามารถจัดการกับข้อผิดพลาดได้ตามที่คุณต้องการ
         print('Failed to update');
+      }
+    } catch (e) {
+      // ดักจับข้อผิดพลาด
+      print('Error: $e');
+    }
+  }
+
+  Future<void> ReportPost(int post_id) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+      print(token);
+      print("post_id: $post_id");
+
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      user_id = jwtDecodedToken['user_id'];
+
+      var headers = {'Content-Type': 'application/json'};
+
+      var url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.reportPOST);
+      Map body = {
+        //'comment_line': commentlineController.text.trim(),
+        'user_id': user_id,
+        'post_id': post_id,
+      };
+      http.Response response =
+          await http.post(url, body: jsonEncode(body), headers: headers);
+
+      // ส่งคำขอ
+      // final response = await request.send();
+
+      if (response.statusCode == 200) {
+        // final responseData = await response.stream.bytesToString();
+        // final json = jsonDecode(responseData);
+
+        //commentlineController.clear();
+      }
+    } catch (e) {
+      Get.back();
+      showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('เกิดข้อผิดพลาด'),
+            contentPadding: EdgeInsets.all(20),
+            children: [Text(e.toString())],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> deleteReport(
+      {required int postId, required int reportId}) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      int user_id = jwtDecodedToken['user_id'];
+
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+
+      var url = Uri.parse(
+          "${ApiEndPoints.baseUrl}${ApiEndPoints.authEndpoints.DELreportPost}/$reportId");
+
+      Map<String, dynamic> body = {
+        'user_id': user_id,
+        'post_id': postId,
+      };
+
+      http.Response response =
+          await http.delete(url, body: jsonEncode(body), headers: headers);
+
+      if (response.statusCode == 200) {
+        // ลบบุ๊กมาร์คสำเร็จ
+        // คุณสามารถทำการอัพเดท UI หรือแอปของคุณตามที่ต้องการ
+        print('Deleted successfully');
+      } else {
+        // ไม่สามารถลบบุ๊กมาร์คได้
+        // คุณสามารถจัดการกับข้อผิดพลาดได้ตามที่คุณต้องการ
+        print('Failed to delete');
       }
     } catch (e) {
       // ดักจับข้อผิดพลาด

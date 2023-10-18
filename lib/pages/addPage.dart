@@ -216,10 +216,10 @@ class _AddState extends State<AddPage> {
 
   Future<void> chooseImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
-      // ทำสิ่งที่คุณต้องการกับรูปภาพที่เลือก
-      // เช่น การแสดงรูปภาพในแอปหรือการอัปโหลดไปยังเซิร์ฟเวอร์ Node.js
+      setState(() {
+        image = pickedFile;
+      });
     }
   }
 
@@ -309,13 +309,7 @@ class _AddState extends State<AddPage> {
       children: [
         TextButton(
           onPressed: () async {
-            final pickedFile =
-                await picker.pickImage(source: ImageSource.gallery);
-            if (pickedFile != null) {
-              setState(() {
-                image = pickedFile;
-              });
-            }
+            chooseImage();
           },
           child: Center(
             child: Container(

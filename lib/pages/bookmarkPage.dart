@@ -133,18 +133,9 @@ class _BookState extends State<BookPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 245, 238, 255),
+        //backgroundColor: Color(0xFF363062),
         body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 255, 255, 255), // สีบน
-                Color.fromARGB(255, 175, 110, 255), // สีล่าง
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
+          decoration: BoxDecoration(color: Color(0xFF4D4C7D)),
           child: Column(
             children: [
               SizedBox(
@@ -160,7 +151,7 @@ class _BookState extends State<BookPage> {
                   //   begin: Alignment.topLeft,
                   //   end: Alignment.bottomRight,
                   // ),
-                  color: Color.fromARGB(255, 213, 174, 255),
+                  color: Color(0xFF363062),
                   // border: Border.all(
                   //   color: Colors.black, // สีขอบ
                   //   width: 2.0, // ความหนาขอบ
@@ -177,7 +168,7 @@ class _BookState extends State<BookPage> {
                       fontSize: 30,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.bold,
-                      color: Color.fromRGBO(147, 71, 255, 1)),
+                      color: Color(0xFFF5F5F5)),
                 ),
               ),
               Expanded(
@@ -306,7 +297,8 @@ class _BookState extends State<BookPage> {
                                                     posts[reverseindex]
                                                         .postName,
                                                     style: TextStyle(
-                                                        color: Colors.black,
+                                                        color:
+                                                            Color(0xFF363062),
                                                         fontSize: 20),
                                                     textAlign: TextAlign.left,
                                                   ),
@@ -316,8 +308,8 @@ class _BookState extends State<BookPage> {
                                                   Container(
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
-                                                        color: Color.fromARGB(
-                                                            255, 179, 140, 255),
+                                                        color:
+                                                            Color(0xFF363062),
                                                         width: 2,
                                                       ),
                                                       borderRadius:
@@ -331,11 +323,8 @@ class _BookState extends State<BookPage> {
                                                       posts[reverseindex]
                                                           .userName,
                                                       style: TextStyle(
-                                                          color: Color.fromARGB(
-                                                              255,
-                                                              138,
-                                                              80,
-                                                              255),
+                                                          color:
+                                                              Color(0xFF4D4C7D),
                                                           fontSize: 15),
                                                       textAlign: TextAlign.left,
                                                     ),
@@ -370,8 +359,7 @@ class _BookState extends State<BookPage> {
                                               ),
                                               child: Icon(
                                                 Icons.bookmark_remove_sharp,
-                                                color: Color.fromARGB(
-                                                    255, 215, 158, 255),
+                                                color: Color(0xFF363062),
                                               ),
                                             )
                                           ],

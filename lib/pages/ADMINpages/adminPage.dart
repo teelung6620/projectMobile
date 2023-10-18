@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:project_mobile/components/my_button.dart';
 import 'package:project_mobile/pages/ADMINpages/addIGD.dart';
+import 'package:project_mobile/pages/ADMINpages/reportPage.dart';
 import 'package:project_mobile/pages/addPage.dart';
 import 'package:project_mobile/pages/bookmarkPage.dart';
 import 'package:project_mobile/pages/login_page.dart';
@@ -39,7 +40,8 @@ class _AdminPageState extends State<AdminPage> {
     AddPage(),
     BookPage(),
     YourPages(),
-    AddIGDPage()
+    AddIGDPage(),
+    ReportPage()
   ];
   void _navigateBottomBar(int index) {
     if (index >= 0 && index < _pages.length) {
@@ -70,6 +72,7 @@ class _AdminPageState extends State<AdminPage> {
           BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: 'Book'),
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Yours'),
           BottomNavigationBarItem(icon: Icon(Icons.food_bank), label: 'IGD'),
+          BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Reports'),
         ],
       ),
     );

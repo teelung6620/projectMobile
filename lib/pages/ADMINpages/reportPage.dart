@@ -78,13 +78,12 @@ class _ReportState extends State<ReportPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('ยืนยันการลบ Bookmark'),
-          content: Text('คุณต้องการลบ Bookmark นี้ ใช่หรือไม่?'),
+          title: Text('ยืนยันการลบ Report'),
+          content: Text('คุณต้องการลบคำร้องขอนี้ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
@@ -94,8 +93,41 @@ class _ReportState extends State<ReportPage> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true); // ยืนยันการลบ
+              },
+              child: Text('ยืนยัน'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future _showDeleteConfirmationDialog2() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('ยืนยันการลบโพสน์'),
+          content: Text('คุณต้องการลบโพสน์นี้ใช่หรือไม่?'),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ยกเลิกการลบ
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
@@ -273,7 +305,13 @@ class _ReportState extends State<ReportPage> {
                                                         size: 12.0,
                                                       ),
                                                   ],
-                                                )
+                                                ),
+                                                Text(
+                                                  "report by ${report[reverseindex].userName}",
+                                                  style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: Colors.black),
+                                                ),
                                               ],
                                             ),
                                             SizedBox(
@@ -326,35 +364,68 @@ class _ReportState extends State<ReportPage> {
                                               ),
                                             ),
                                             Spacer(),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                bool confirmDelete =
-                                                    await _showDeleteConfirmationDialog();
-                                                if (confirmDelete) {
-                                                  await PostController()
-                                                      .deleteReport(
-                                                    postId: posts[reverseindex]
-                                                        .postId,
-                                                    reportId:
-                                                        report[reverseindex]
-                                                            .reportId,
-                                                  );
-                                                  await getReport();
-                                                  setState(() {
-                                                    getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
-                                                  });
-                                                }
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                              ),
-                                              child: Icon(
-                                                Icons.report_off_sharp,
-                                                color: Color(0xFF363062),
-                                              ),
-                                            )
+                                            Column(
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    bool confirmDelete =
+                                                        await _showDeleteConfirmationDialog();
+                                                    if (confirmDelete) {
+                                                      await PostController()
+                                                          .deleteReport(
+                                                        postId:
+                                                            posts[reverseindex]
+                                                                .postId,
+                                                        reportId:
+                                                            report[reverseindex]
+                                                                .reportId,
+                                                      );
+                                                      await getReport();
+                                                      setState(() {
+                                                        getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
+                                                      });
+                                                    }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            255, 255, 255, 255),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.report_off_sharp,
+                                                    color: Color(0xFF363062),
+                                                  ),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    bool confirmDelete =
+                                                        await _showDeleteConfirmationDialog2();
+                                                    if (confirmDelete) {
+                                                      await PostController()
+                                                          .deletePost(
+                                                        posts[reverseindex]
+                                                            .postId,
+                                                      );
+
+                                                      setState(() {
+                                                        getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
+                                                      });
+                                                    }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            255, 255, 255, 255),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.delete_forever_sharp,
+                                                    color: Color(0xFF363062),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ],

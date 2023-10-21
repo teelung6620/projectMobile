@@ -11,7 +11,9 @@ import '../controller/bookmarkController.dart';
 import '../controller/post_controller.dart';
 import '../model/Ingredients.list.dart';
 import '../model/post.dart';
+import '../model/user.dart';
 import '../model/userPost.dart';
+import 'EditProfile.dart';
 import 'detail_page.dart';
 import 'home.dart';
 import 'package:http/http.dart' as http;
@@ -59,22 +61,35 @@ class _ListState extends State<ListPage> {
     try {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       userId = int.tryParse(decodedToken['user_id'].toString());
-      userName = decodedToken['user_name'];
-      userEmail = decodedToken['user_email'];
+      // userName = decodedToken['user_name'];
+      //userEmail = decodedToken['user_email'];
       userImage = decodedToken['user_image'];
       userType = decodedToken['user_type'];
-      print(userId);
-      print(userName);
-      print(userEmail);
-      print(userImage);
-      print(userType);
+      // print(userId);
+      // print(userName);
+      // print(userEmail);
+      // print(userImage);
+      // print(userType);
 
-      // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
-      // await getBookmark();
-      // await getPost();
+      // เรียกดึงข้อมูลผู้ใช้
+      //await getUser();
     } catch (error) {
       print('Error decoding token: $error');
     }
+  }
+
+  Future<void> getUser() async {
+    var url = Uri.parse("http://10.0.2.2:4000/login");
+    var response = await http.get(url);
+    var users = userFromJson(response.body);
+
+    // หา username ที่มี user_id ตรงกับของ token
+    var userWithMatchingId = users.firstWhere((user) => user.userId == userId);
+    //users = users.where((element) => element.userId == userId).toList();
+    //print(users);
+    print("User with matching ID: ${userWithMatchingId.userName}");
+    userName = userWithMatchingId.userName;
+    userEmail = userWithMatchingId.userEmail;
   }
 
   // get teams
@@ -216,6 +231,7 @@ class _ListState extends State<ListPage> {
     super.initState();
     getIGD();
     getPost();
+    getUser();
     SharedPreferences.getInstance().then((prefs) {
       final String? token = prefs.getString('token');
       if (token != null) {
@@ -262,56 +278,74 @@ class _ListState extends State<ListPage> {
                               color: Colors.white,
                             )),
                         Spacer(),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfilePage(
+                                  userName: userName
+                                      .toString(), // Pass the user_name to EditProfilePage
+                                  userEmail: userEmail
+                                      .toString(), // Pass the user_email to EditProfilePage
+                                  userImage: userImage
+                                      .toString(), // Pass the user_image to EditProfilePage
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Color(0xFFF99417),
+                                width: 5,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30.0),
+                                //bottomLeft: Radius.circular(10.0)
+                              ),
                               color: Color(0xFFF99417),
-                              width: 5,
                             ),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30.0),
-                              //bottomLeft: Radius.circular(10.0)
-                            ),
-                            color: Color(0xFFF99417),
-                          ),
-                          padding: EdgeInsets.all(2),
-                          child: Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    '$userName',
-                                    style: TextStyle(
+                            padding: EdgeInsets.all(2),
+                            child: Row(
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      '$userName',
+                                      style: TextStyle(
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white),
-                                  ),
-                                  Text(
-                                    '$userEmail',
-                                    style:
-                                        TextStyle(fontStyle: FontStyle.italic),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage: userImage != null
-                                    ? NetworkImage(
-                                        'http://10.0.2.2:4000/uploadPostImage/$userImage',
-                                      )
-                                    : NetworkImage(
-                                        'http://10.0.2.2:4000/uploadPostImage/coke.jpg'), // รูปภาพสำรอง
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                            ],
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    Text(
+                                      '$userEmail',
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: userImage != null
+                                      ? NetworkImage(
+                                          'http://10.0.2.2:4000/uploadPostImage/$userImage',
+                                        )
+                                      : NetworkImage(
+                                          'http://10.0.2.2:4000/uploadPostImage/coke.jpg'), // รูปภาพสำรอง
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                     Padding(

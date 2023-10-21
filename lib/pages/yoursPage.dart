@@ -6,6 +6,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/BookMark.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
+import 'package:project_mobile/pages/EditPage.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
@@ -326,6 +327,32 @@ class _YourState extends State<YourPages> {
                                             ),
                                             Spacer(),
                                             ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        EditPage(
+                                                      userP:
+                                                          posts[reverseindex],
+                                                      post_id:
+                                                          posts[reverseindex]
+                                                              .postId,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                              ),
+                                              child: Icon(
+                                                Icons.edit,
+                                                color: Color(0xFF363062),
+                                              ),
+                                            ),
+                                            ElevatedButton(
                                               onPressed: () async {
                                                 bool confirmDelete =
                                                     await _showDeleteConfirmationDialog();
@@ -353,53 +380,7 @@ class _YourState extends State<YourPages> {
                                           ],
                                         ),
                                       ],
-                                    )
-
-                                    // Align(
-                                    //   child: ListTile(
-                                    //     subtitleTextStyle: const TextStyle(
-                                    //       fontSize: 20,
-                                    //       fontWeight: FontWeight.normal,
-                                    //     ),
-                                    //     titleTextStyle: const TextStyle(
-                                    //       color: Colors.black,
-                                    //       fontSize: 25,
-                                    //       fontWeight: FontWeight.normal,
-                                    //     ),
-                                    //     leading: Expanded(
-                                    //       child: Image(
-                                    //         image: NetworkImage(
-                                    //           'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //     title: Text(
-                                    //       newPosts[reverseindex].postName,
-                                    //       textAlign: TextAlign.left,
-                                    //     ),
-                                    //     subtitle: Text(
-                                    //       newPosts[reverseindex].userName,
-                                    //       textAlign: TextAlign.left,
-                                    //     ),
-                                    //     trailing: Container(
-                                    //       width:
-                                    //           100, // ปรับความกว้างของช่องแสดง totalCal ตามที่คุณต้องการ
-                                    //       alignment: Alignment
-                                    //           .centerRight, // จัดตำแหน่งข้อความที่ด้านขวา
-                                    //       child: newPosts[reverseindex].totalCal !=
-                                    //               null
-                                    //           ? Text(
-                                    //               "${newPosts[reverseindex].totalCal}",
-                                    //               style: TextStyle(
-                                    //                 fontSize: 18,
-                                    //                 fontWeight: FontWeight.bold,
-                                    //               ),
-                                    //             )
-                                    //           : SizedBox(),
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    ),
+                                    )),
                               ),
                             );
                           },

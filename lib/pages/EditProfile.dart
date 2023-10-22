@@ -1,11 +1,16 @@
+import 'dart:convert';
+
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/BookMark.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
+import 'package:project_mobile/pages/ListPage.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
@@ -23,17 +28,24 @@ import '../controller/bookmarkController.dart';
 import '../controller/login_controller.dart';
 import '../controller/registeration_controller.dart';
 import '../model/userPost.dart';
+import '../utils/api_endpoint.dart';
+import 'ADMINpages/adminPage.dart';
 import 'detail_page.dart';
+import 'home.dart';
+
+import 'package:dio/dio.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userName;
   final String userEmail;
   final String userImage;
+  final String userPassword;
   EditProfilePage(
       {Key? key,
       required this.userName,
       required this.userEmail,
-      required this.userImage})
+      required this.userImage,
+      required this.userPassword})
       : super(key: key);
   @override
   State<EditProfilePage> createState() => _EditProfileState();
@@ -48,19 +60,10 @@ class _EditProfileState extends State<EditProfilePage> {
   TextEditingController userNameController = TextEditingController();
   LoginController patchController = Get.put(LoginController());
 
-  Future getBookmark() async {
-    var url = Uri.parse("http://10.0.2.2:4000/bookmarks");
-    var response = await http.get(url);
-    bookmark = bookMarkFromJson(response.body);
-
-    // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId
-    bookmark = bookmark.where((element) => element.userId == userId).toList();
-  }
-
-  Future<void> loginUser() async {
-    // โค้ดสำหรับล็อกอินของคุณ
-  }
-
+  final ListPage listpage = ListPage();
+  XFile? image;
+  final picker = ImagePicker();
+  //String? userIMAGE =  widget.userImage;
   Future getPost() async {
     var url = Uri.parse("http://10.0.2.2:4000/post_data");
     var response = await http.get(url);
@@ -99,8 +102,8 @@ class _EditProfileState extends State<EditProfilePage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('ยืนยันการลบ Bookmark'),
-          content: Text('คุณต้องการลบ Bookmark นี้ ใช่หรือไม่?'),
+          title: Text('ยืนยันการเปลี่ยนแปลง'),
+          content: Text('คุณต้องการเปลี่ยนแปลงข้อมูลนี้ ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -120,6 +123,10 @@ class _EditProfileState extends State<EditProfilePage> {
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
+                saveUserName();
+                // if (image != null) {
+                //   saveUserImage();
+                // }
                 Navigator.of(context).pop(true); // ยืนยันการลบ
               },
               child: Text('ยืนยัน'),
@@ -138,7 +145,7 @@ class _EditProfileState extends State<EditProfilePage> {
     if (token != null) {
       // Call the method to save the user name and email
       final LoginController loginController = Get.find();
-      await loginController.patchUserData();
+      await loginController.patchUserData(); // ส่งรูปภาพด้วย
 
       // Optionally, you can show a confirmation or success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -151,13 +158,49 @@ class _EditProfileState extends State<EditProfilePage> {
     }
   }
 
+  void saveUserImage() async {
+    // Get the token from SharedPreferences
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? token = prefs.getString('token');
+
+    if (token != null) {
+      // Call the method to save the user name and email
+      final LoginController loginController = Get.find();
+      await loginController.patchUserImage(image!.path); // ส่งรูปภาพด้วย
+
+      // Optionally, you can show a confirmation or success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('User data updated successfully'),
+        ),
+      );
+    } else {
+      // Handle the case where token is null
+    }
+  }
+
+  Future<void> chooseImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        image = pickedFile;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    getBookmark();
+
+    // image = XFile('http://10.0.2.2:4000/uploadPostImage/${widget.userImage}');
+    // print(image);
+
     getPost();
     patchController.nameController.text = widget.userName;
     patchController.emailController.text = widget.userEmail;
+    //patchController.passwordController.text = widget.userPassword;
+    // image = XFile('http://10.0.2.2:4000/uploadPostImage/${widget.userImage}');
+
     SharedPreferences.getInstance().then((prefs) {
       final String? token = prefs.getString('token');
       if (token != null) {
@@ -170,56 +213,120 @@ class _EditProfileState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Color.fromARGB(255, 63, 57, 109),
         appBar: AppBar(
           // automaticallyImplyLeading: false,
           title: Text(
-            (widget.userName),
+            'แก้ไขโปรไฟล์',
             style: TextStyle(fontSize: 25),
           ),
           centerTitle: true,
           backgroundColor: Color(0xFF363062),
           toolbarHeight: 60,
         ),
-        body: Column(
-          children: [
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF363062),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0), // ความโค้งขอบ
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              TextButton(
+                onPressed: () async {
+                  chooseImage();
+                },
+                child: Center(
+                  child: Container(
+                    width: 300,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: image != null
+                        ? Image.file(
+                            File(image!.path),
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          )
+                        : widget.userImage != null
+                            ? Image.network(
+                                'http://10.0.2.2:4000/uploadPostImage/${widget.userImage}',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              )
+                            : Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'เลือกรูปภาพของคุณ',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Color.fromARGB(255, 114, 26, 236),
+                                  ),
+                                ),
+                              ),
+                  ),
                 ),
               ),
-              padding: EdgeInsets.all(20.0), // ความห่างระหว่างขอบและเนื้อหา
-
-              child: TextField(
-                controller: patchController.nameController,
+              Text(
+                'แตะที่รูปภาพเพื่อเปลี่ยน',
+                style: TextStyle(color: Colors.white),
               ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Color(0xFF363062),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0), // ความโค้งขอบ
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: TextField(
+                  controller: patchController.nameController,
+                  decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromARGB(255, 102, 31, 243))),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      fillColor: const Color.fromARGB(255, 255, 255, 255),
+                      filled: true,
+                      hintStyle: const TextStyle(
+                          color: Color.fromARGB(255, 206, 206, 206))),
                 ),
               ),
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: patchController.emailController,
+              SizedBox(
+                height: 10,
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // Call the method to save the user name
-                saveUserName();
-                Navigator.pop(context, true); // ปิดหน้าปัจจุบัน
-              },
-              child: Text('Save'),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: TextField(
+                  controller: patchController.emailController,
+                  decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromARGB(255, 102, 31, 243))),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      fillColor: const Color.fromARGB(255, 255, 255, 255),
+                      filled: true,
+                      hintStyle: const TextStyle(
+                          color: Color.fromARGB(255, 206, 206, 206))),
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Spacer(),
+              SubmitButton(
+                  onPressed: () {
+                    // Call the method to save the user name
+                    _showDeleteConfirmationDialog();
+                  },
+                  title: 'SAVE'),
+              SizedBox(
+                height: 30,
+              )
+            ],
+          ),
         ),
       ),
     );

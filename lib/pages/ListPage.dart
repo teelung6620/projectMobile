@@ -50,6 +50,7 @@ class _ListState extends State<ListPage> {
   String? userEmail;
   String? userImage;
   String? userType;
+  String? userPassword;
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -72,7 +73,7 @@ class _ListState extends State<ListPage> {
       // print(userType);
 
       // เรียกดึงข้อมูลผู้ใช้
-      //await getUser();
+      await getUser();
     } catch (error) {
       print('Error decoding token: $error');
     }
@@ -226,18 +227,25 @@ class _ListState extends State<ListPage> {
     );
   }
 
+  void onGoBack(dynamic value) {
+    print("onGoBack is called");
+    getUser();
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     getIGD();
     getPost();
-    getUser();
+
     SharedPreferences.getInstance().then((prefs) {
       final String? token = prefs.getString('token');
       if (token != null) {
         _printUserIdFromToken(token);
       }
     });
+    //getUser();
   }
 
   @override
@@ -279,20 +287,18 @@ class _ListState extends State<ListPage> {
                             )),
                         Spacer(),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => EditProfilePage(
-                                  userName: userName
-                                      .toString(), // Pass the user_name to EditProfilePage
-                                  userEmail: userEmail
-                                      .toString(), // Pass the user_email to EditProfilePage
-                                  userImage: userImage
-                                      .toString(), // Pass the user_image to EditProfilePage
+                                  userName: userName.toString(),
+                                  userEmail: userEmail.toString(),
+                                  userImage: userImage.toString(),
+                                  userPassword: userPassword.toString(),
                                 ),
                               ),
-                            );
+                            ).then(onGoBack);
                           },
                           child: Container(
                             decoration: BoxDecoration(
@@ -779,30 +785,36 @@ class _ListState extends State<ListPage> {
                                                     color: Color(0xFF363062),
                                                   ),
                                                 ),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    await PostController()
-                                                        .ReportPost(
-                                                      newPosts[reverseindex]
-                                                          .postId,
-                                                    );
+                                                Visibility(
+                                                  visible: userType == "user",
+                                                  child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      await PostController()
+                                                          .ReportPost(
+                                                        newPosts[reverseindex]
+                                                            .postId,
+                                                      );
 
-                                                    Get.snackbar(
-                                                      'Report สำเร็จ',
-                                                      'ระบบได้ส่งคำร้องของคุณแล้ว',
-                                                      snackPosition:
-                                                          SnackPosition.TOP,
-                                                    );
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        const Color.fromARGB(
-                                                            255, 255, 255, 255),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.report,
-                                                    color: Color(0xFF363062),
+                                                      Get.snackbar(
+                                                        'Report สำเร็จ',
+                                                        'ระบบได้ส่งคำร้องของคุณแล้ว',
+                                                        snackPosition:
+                                                            SnackPosition.TOP,
+                                                      );
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              255),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.report,
+                                                      color: Color(0xFF363062),
+                                                    ),
                                                   ),
                                                 ),
                                                 Visibility(

@@ -19,6 +19,7 @@ class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  TextEditingController OldPassController = TextEditingController();
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   late int user_id;
   late int post_id;
@@ -122,83 +123,42 @@ class LoginController extends GetxController {
   //   }
   // }
 
-  // Future<void> patchUserData(String imagePath) async {
-  //   try {
-  //     SharedPreferences prefs = await SharedPreferences.getInstance();
-  //     String? token = prefs.getString("token");
-  //     print(token);
-
-  //     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
-  //     user_id = jwtDecodedToken['user_id'];
-
-  //     var url = Uri.parse(
-  //         ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.loginEmail);
-
-  //     var request = http.MultipartRequest('PATCH', url);
-
-  //     // เพิ่มข้อมูลผู้ใช้ที่ต้องการอัปเดต
-  //     request.fields['user_id'] = user_id.toString();
-  //     request.fields['user_name'] = nameController.text;
-  //     request.fields['user_email'] = emailController.text;
-  //     request.fields['user_password'] = passwordController.text;
-
-  //     // เพิ่มรูปภาพเข้าไป
-  //     request.files.add(await http.MultipartFile.fromPath(
-  //       'user_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
-  //       imagePath, // ไฟล์รูปภาพ
-  //       contentType: MediaType('image', 'jpeg/png/jpg'),
-  //     ));
-  //     print(imagePath);
-
-  //     // ใส่ Token เข้าไปใน header เพื่อทำการยืนยันตัวตน
-  //     request.headers['Authorization'] = 'Bearer $token';
-
-  //     // ส่งคำขอ
-  //     var response = await request.send();
-  //   } catch (e) {
-  //     Get.back();
-  //     showDialog(
-  //       context: Get.context!,
-  //       builder: (context) {
-  //         return SimpleDialog(
-  //           title: Text('เกิดข้อผิดพลาด'),
-  //           contentPadding: EdgeInsets.all(20),
-  //           children: [Text(e.toString())],
-  //         );
-  //       },
-  //     );
-  //   }
-  // }
-
   Future<void> patchUserData() async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("token");
       print(token);
-      //print("post_id: $post_id");
 
       Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
       user_id = jwtDecodedToken['user_id'];
 
-      var headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
+      var url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.UpdateUser);
 
-      var url = Uri.parse(ApiEndPoints.baseUrl +
-          ApiEndPoints
-              .authEndpoints.loginEmail); // ปรับเปลี่ยน URL ตามความเหมาะสม
+      var request = http.MultipartRequest('PATCH', url);
 
-      Map body = {
-        'user_id': user_id,
-        'user_name': nameController.text,
-        'user_email': emailController.text,
-        'user_password': passwordController.text,
-      };
-      http.Response response =
-          await http.patch(url, body: jsonEncode(body), headers: headers);
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      // เพิ่มข้อมูลผู้ใช้ที่ต้องการอัปเดต
+      request.fields['user_id'] = user_id.toString();
+      request.fields['user_name'] = nameController.text;
+      // request.fields['user_email'] = emailController.text;
+      request.fields['user_password'] = passwordController.text;
+      // request.fields['old_password'] = OldPassController.text;
+      // เพิ่มรูปภาพเข้าไป
+
+      // if (imagePath != null) {
+      //   request.files.add(await http.MultipartFile.fromPath(
+      //     'user_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
+      //     imagePath, // ไฟล์รูปภาพ
+      //     contentType: MediaType('image', 'jpeg/png/jpg'),
+      //   ));
+      //   //print(imagePath);
+      // }
+
+      // ใส่ Token เข้าไปใน header เพื่อทำการยืนยันตัวตน
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // ส่งคำขอ
+      var response = await request.send();
     } catch (e) {
       Get.back();
       showDialog(
@@ -214,7 +174,51 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<void> patchUserImage(String imagePath) async {
+  // Future<void> patchUserData() async {
+  //   try {
+  //     SharedPreferences prefs = await SharedPreferences.getInstance();
+  //     String? token = prefs.getString("token");
+  //     print(token);
+  //     //print("post_id: $post_id");
+
+  //     Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+  //     user_id = jwtDecodedToken['user_id'];
+
+  //     var headers = {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': 'Bearer $token',
+  //     };
+
+  //     var url = Uri.parse(ApiEndPoints.baseUrl +
+  //         ApiEndPoints
+  //             .authEndpoints.loginEmail); // ปรับเปลี่ยน URL ตามความเหมาะสม
+
+  //     Map body = {
+  //       'user_id': user_id,
+  //       'user_name': nameController.text,
+  //       'user_email': emailController.text,
+  //       'user_password': passwordController.text,
+  //     };
+  //     http.Response response =
+  //         await http.patch(url, body: jsonEncode(body), headers: headers);
+  //     print('Response Status Code: ${response.statusCode}');
+  //     print('Response Body: ${response.body}');
+  //   } catch (e) {
+  //     Get.back();
+  //     showDialog(
+  //       context: Get.context!,
+  //       builder: (context) {
+  //         return SimpleDialog(
+  //           title: Text('เกิดข้อผิดพลาด'),
+  //           contentPadding: EdgeInsets.all(20),
+  //           children: [Text(e.toString())],
+  //         );
+  //       },
+  //     );
+  //   }
+  // }
+
+  Future<void> patchUserImage(String? imagePath) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("token");
@@ -224,17 +228,19 @@ class LoginController extends GetxController {
       user_id = jwtDecodedToken['user_id'];
 
       var url = Uri.parse(
-          ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.loginEmail);
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.UpdateImage);
 
       var request = http.MultipartRequest('PATCH', url);
-
+      request.fields['user_id'] = user_id.toString();
       // เพิ่มรูปภาพเข้าไป
-      request.files.add(await http.MultipartFile.fromPath(
-        'user_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
-        imagePath, // ไฟล์รูปภาพ
-        contentType: MediaType('image', 'jpeg/png/jpg'),
-      ));
-      print(imagePath);
+      if (imagePath != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'user_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
+          imagePath, // ไฟล์รูปภาพ
+          contentType: MediaType('image', 'jpeg/png/jpg'),
+        ));
+        //print(imagePath);
+      }
 
       // ใส่ Token เข้าไปใน header เพื่อทำการยืนยันตัวตน
       request.headers['Authorization'] = 'Bearer $token';

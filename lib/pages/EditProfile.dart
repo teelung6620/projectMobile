@@ -38,7 +38,7 @@ import 'package:dio/dio.dart';
 class EditProfilePage extends StatefulWidget {
   final String userName;
   final String userEmail;
-  final String userImage;
+  final String? userImage;
   final String userPassword;
   EditProfilePage(
       {Key? key,
@@ -87,7 +87,7 @@ class _EditProfileState extends State<EditProfilePage> {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       userId = int.tryParse(decodedToken['user_id'].toString());
 
-      print(userId);
+      //print(userId);
 
       // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
       // await getBookmark();
@@ -123,7 +123,9 @@ class _EditProfileState extends State<EditProfilePage> {
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
+                saveUserImage();
                 saveUserName();
+
                 // if (image != null) {
                 //   saveUserImage();
                 // }
@@ -136,6 +138,36 @@ class _EditProfileState extends State<EditProfilePage> {
       },
     );
   }
+
+  // void saveUserName() async {
+  //   // Get the token from SharedPreferences
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   final String? token = prefs.getString('token');
+
+  //   if (token != null) {
+  //     // Call the method to save the user name and email
+  //     final LoginController loginController = Get.find();
+
+  //     // ตรวจสอบว่าตัวแปร `image` มีค่า `null` หรือไม่
+  //     if (image != null) {
+  //       // ถ้าตัวแปร `image` ไม่ใช่ค่า `null` ให้ใช้รูปภาพใหม่
+  //       await loginController.patchUserData(image!.path);
+  //     } else {
+  //       // ถ้าตัวแปร `image` เป็นค่า `null` ให้ใช้รูปภาพเดิมจาก widget
+  //       await loginController.patchUserData(
+  //           'http://10.0.2.2:4000/uploadPostImage/${widget.userImage}');
+  //     }
+
+  //     // Optionally, you can show a confirmation or success message
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('User data updated successfully'),
+  //       ),
+  //     );
+  //   } else {
+  //     // Handle the case where token is null
+  //   }
+  // }
 
   void saveUserName() async {
     // Get the token from SharedPreferences
@@ -198,8 +230,9 @@ class _EditProfileState extends State<EditProfilePage> {
     getPost();
     patchController.nameController.text = widget.userName;
     patchController.emailController.text = widget.userEmail;
+
     //patchController.passwordController.text = widget.userPassword;
-    // image = XFile('http://10.0.2.2:4000/uploadPostImage/${widget.userImage}');
+    //image = XFile('http://10.0.2.2:4000/uploadPostImage/${widget.userImage}');
 
     SharedPreferences.getInstance().then((prefs) {
       final String? token = prefs.getString('token');
@@ -275,6 +308,14 @@ class _EditProfileState extends State<EditProfilePage> {
               SizedBox(
                 height: 10,
               ),
+              Text(
+                'Username',
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+              SizedBox(
+                height: 5,
+              ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: TextField(
@@ -293,12 +334,20 @@ class _EditProfileState extends State<EditProfilePage> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 20,
+              ),
+              Text(
+                'Password',
+                textAlign: TextAlign.left,
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+              SizedBox(
+                height: 5,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: TextField(
-                  controller: patchController.emailController,
+                  controller: patchController.passwordController,
                   decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(
@@ -309,9 +358,30 @@ class _EditProfileState extends State<EditProfilePage> {
                       fillColor: const Color.fromARGB(255, 255, 255, 255),
                       filled: true,
                       hintStyle: const TextStyle(
-                          color: Color.fromARGB(255, 206, 206, 206))),
+                          color: Color.fromARGB(255, 206, 206, 206)),
+                      hintText: "เปลี่ยน password ที่นี่"),
                 ),
               ),
+              SizedBox(
+                height: 10,
+              ),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              //   child: TextField(
+              //     controller: patchController.emailController,
+              //     decoration: InputDecoration(
+              //         enabledBorder: const OutlineInputBorder(
+              //             borderSide: BorderSide(
+              //                 color: Color.fromARGB(255, 102, 31, 243))),
+              //         focusedBorder: const OutlineInputBorder(
+              //           borderSide: BorderSide(color: Colors.white),
+              //         ),
+              //         fillColor: const Color.fromARGB(255, 255, 255, 255),
+              //         filled: true,
+              //         hintStyle: const TextStyle(
+              //             color: Color.fromARGB(255, 206, 206, 206))),
+              //   ),
+              // ),
               SizedBox(
                 height: 10,
               ),

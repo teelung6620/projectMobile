@@ -64,7 +64,7 @@ class _ListState extends State<ListPage> {
       userId = int.tryParse(decodedToken['user_id'].toString());
       // userName = decodedToken['user_name'];
       //userEmail = decodedToken['user_email'];
-      userImage = decodedToken['user_image'];
+      //userImage = decodedToken['user_image'];
       userType = decodedToken['user_type'];
       // print(userId);
       // print(userName);
@@ -91,6 +91,7 @@ class _ListState extends State<ListPage> {
     print("User with matching ID: ${userWithMatchingId.userName}");
     userName = userWithMatchingId.userName;
     userEmail = userWithMatchingId.userEmail;
+    userImage = userWithMatchingId.userImage;
   }
 
   // get teams

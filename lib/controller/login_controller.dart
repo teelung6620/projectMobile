@@ -39,6 +39,13 @@ class LoginController extends GetxController {
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
+        if (json['status'] == 'verify') {
+          Get.snackbar(
+            'Verify',
+            'verify your email',
+            snackPosition: SnackPosition.TOP,
+          );
+        }
         if (json['status'] == 'ok_user') {
           var token = json['token'];
 

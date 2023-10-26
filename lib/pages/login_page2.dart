@@ -16,6 +16,46 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   LoginController loginController = Get.put(LoginController());
+  RegisterationController registerationController =
+      Get.put(RegisterationController());
+
+  Future _showDeleteConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('กรุณากรอก OTP จาก email ของคุณ'),
+          content: TextField(
+            controller: registerationController.verifyController,
+            keyboardType: TextInputType.number,
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ยกเลิกการลบ
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true); // ยืนยันการลบ
+                registerationController.verifyEmail();
+              },
+              child: Text('ยืนยัน'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   var isLogin = false.obs;
   @override
@@ -100,7 +140,10 @@ class _LoginScreenState extends State<LoginScreen> {
           height: 20,
         ),
         SubmitButton(
-          onPressed: () => loginController.loginWithEmail(),
+          onPressed: () => {
+            loginController.loginWithEmail(),
+            _showDeleteConfirmationDialog()
+          },
           title: 'Login',
         )
       ],

@@ -22,6 +22,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
   ImagePicker picker = ImagePicker();
   XFile? image;
 
+  Future _showDeleteConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('กรุณากรอก OTP จาก email ของคุณ'),
+          content: TextField(
+            controller: registerationController.verifyController,
+            keyboardType: TextInputType.number,
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ยกเลิกการลบ
+                registerationController.deleteUser();
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true); // ยืนยันการลบ
+                registerationController.verifyEmail();
+              },
+              child: Text('ยืนยัน'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   var isLogin = false.obs;
   @override
   Widget build(BuildContext context) {
@@ -138,8 +177,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           height: 20,
         ),
         SubmitButton(
-          onPressed: () =>
-              registerationController.registerWithEmail(image!.path),
+          onPressed: () => {
+            registerationController.registerWithEmail(image!.path),
+            _showDeleteConfirmationDialog()
+          },
           title: 'Register',
         )
       ],

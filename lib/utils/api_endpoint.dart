@@ -18,4 +18,5 @@ class _AuthEndPoints {
   final String DELreportPost = '/DELreports';
   final String UpdateImage = '/userImage';
   final String UpdateUser = '/UpdateUser';
+  final String UpdatePostImage = '/uploadPostImage';
 }

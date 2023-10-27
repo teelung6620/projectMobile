@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 252, 249, 255),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(36),
@@ -142,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SubmitButton(
           onPressed: () => {
             loginController.loginWithEmail(),
-            _showDeleteConfirmationDialog()
+            //_showDeleteConfirmationDialog()
           },
           title: 'Login',
         )

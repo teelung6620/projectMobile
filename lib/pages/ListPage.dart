@@ -197,8 +197,8 @@ class _ListState extends State<ListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('ยืนยันการลบ Bookmark'),
-          content: Text('คุณต้องการลบ Bookmark นี้ ใช่หรือไม่?'),
+          title: Text('ยืนยันการลบโพสน์'),
+          content: Text('คุณต้องการลบโพสนี้ ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(

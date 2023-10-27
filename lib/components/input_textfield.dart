@@ -11,16 +11,22 @@ class InputTextFieldWidget extends StatelessWidget {
     return Container(
       height: 46,
       width: 380,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+            color: Color.fromARGB(255, 130, 80, 184)), // กำหนดเส้นขอบสีเทา
+        borderRadius: BorderRadius.circular(10), // กำหนดรูปร่างขอบเขต
+      ),
       child: TextField(
         controller: textEditingController,
         decoration: InputDecoration(
             alignLabelWithHint: true,
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                    color: const Color.fromARGB(255, 255, 255, 255))),
+                borderSide:
+                    BorderSide(color: Color.fromARGB(255, 255, 255, 255))),
             fillColor: Color.fromARGB(255, 255, 255, 255),
             hintText: hintText,
-            hintStyle: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+            hintStyle: TextStyle(color: Color.fromARGB(255, 111, 111, 111)),
             contentPadding: EdgeInsets.all(15),
             focusColor: Color.fromARGB(255, 255, 255, 255),
             border:

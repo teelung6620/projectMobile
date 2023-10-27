@@ -17,7 +17,7 @@ class UserPost {
   String postDescription;
   String postTypes;
   List<IngredientsId> ingredientsId;
-  String postImage;
+  String? postImage;
   DateTime postTime;
   String userName;
   String? averageScore;

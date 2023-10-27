@@ -282,4 +282,104 @@ class PostController extends GetxController {
       print('Error: $e');
     }
   }
+
+  Future<void> patchPostData(List<int> _selectedUnits) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+      print(token);
+
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      user_id = jwtDecodedToken['user_id'];
+
+      var url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.UpdateUser);
+
+      var request = http.MultipartRequest('PATCH', url);
+
+      // เพิ่มข้อมูลผู้ใช้ที่ต้องการอัปเดต
+      request.fields['post_name'] = nameController.text.trim();
+      request.fields['post_description'] = descriptionController.text.trim();
+      request.fields['post_types'] = typeController.text.trim();
+      request.fields['ingredients_id'] = IGDController
+          .text; // ถ้า IGDController มีข้อมูลเกี่ยวกับ ingredients_id
+      request.fields['user_id'] =
+          user_id.toString(); // เพิ่ม user_id ที่ดึงมาจาก SharedPreferences
+      request.fields['ingredients_unit'] = _selectedUnits.toString();
+      // request.fields['old_password'] = OldPassController.text;
+      // เพิ่มรูปภาพเข้าไป
+
+      // if (imagePath != null) {
+      //   request.files.add(await http.MultipartFile.fromPath(
+      //     'user_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
+      //     imagePath, // ไฟล์รูปภาพ
+      //     contentType: MediaType('image', 'jpeg/png/jpg'),
+      //   ));
+      //   //print(imagePath);
+      // }
+
+      // ใส่ Token เข้าไปใน header เพื่อทำการยืนยันตัวตน
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // ส่งคำขอ
+      var response = await request.send();
+    } catch (e) {
+      Get.back();
+      showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('เกิดข้อผิดพลาด'),
+            contentPadding: EdgeInsets.all(20),
+            children: [Text(e.toString())],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> patchPostImage(String? imagePath, int postId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+      print(token);
+
+      Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(token!);
+      user_id = jwtDecodedToken['user_id'];
+
+      var url = Uri.parse(
+          ApiEndPoints.baseUrl + ApiEndPoints.authEndpoints.UpdatePostImage);
+
+      var request = http.MultipartRequest('PATCH', url);
+      request.fields['post_id'] = postId.toString();
+      // เพิ่มรูปภาพเข้าไป
+
+      if (imagePath != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+          'post_image', // ชื่อของ field สำหรับรูปภาพในร้องขอ
+          imagePath, // ไฟล์รูปภาพ
+          contentType: MediaType('image', 'jpeg/png/jpg'),
+        ));
+        //print(imagePath);
+      }
+
+      // ใส่ Token เข้าไปใน header เพื่อทำการยืนยันตัวตน
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // ส่งคำขอ
+      var response = await request.send();
+    } catch (e) {
+      Get.back();
+      showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('เกิดข้อผิดพลาด'),
+            contentPadding: EdgeInsets.all(20),
+            children: [Text(e.toString())],
+          );
+        },
+      );
+    }
+  }
 }

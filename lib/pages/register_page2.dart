@@ -10,6 +10,8 @@ import '../components/input_textfield.dart';
 import '../components/submitButton.dart';
 import '../controller/login_controller.dart';
 import '../controller/registeration_controller.dart';
+import '../model/user.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -21,6 +23,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Get.put(RegisterationController());
   ImagePicker picker = ImagePicker();
   XFile? image;
+  List<User> userList = [];
+
+  Future getUser() async {
+    var url = Uri.parse("http://10.0.2.2:4000/login");
+    var response = await http.get(url);
+    userList = userFromJson(response.body);
+
+    setState(() {
+      userList;
+      print(userList);
+    });
+
+    // ตรวจสอบว่ามีอีเมลที่ซ้ำกันหรือไม่
+    // if (userList.any((user) =>
+    //     user.userEmail ==
+    //     registerationController.emailController.text.trim())) {
+    //   _showDeleteConfirmationDialog();
+    // }
+  }
 
   Future _showDeleteConfirmationDialog() async {
     return showDialog(
@@ -65,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 229, 214, 255),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(36),
@@ -78,10 +99,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     SizedBox(
                       height: 80,
                     ),
-                    Image.asset(
-                      'lib/assets/logoNew.png',
-                      scale: 2.5,
-                    ),
+                    // Image.asset(
+                    //   'lib/assets/logoNew.png',
+                    //   scale: 2.5,
+                    // ),
                     TextButton(
                       onPressed: () async {
                         final pickedFile =
@@ -96,7 +117,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Center(
                           child: CircleAvatar(
                         radius: 100, // กำหนดรัศมีของ Circle Avatar
-                        backgroundColor: Colors.white, // กำหนดสีพื้นหลัง
+                        backgroundColor: Color.fromARGB(
+                            255, 231, 231, 231), // กำหนดสีพื้นหลัง
                         child: image != null
                             ? ClipOval(
                                 child: Image.file(
@@ -177,9 +199,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           height: 20,
         ),
         SubmitButton(
-          onPressed: () => {
-            registerationController.registerWithEmail(image!.path),
-            _showDeleteConfirmationDialog()
+          onPressed: () {
+            if (!userList.any((user) =>
+                user.userEmail !=
+                registerationController.emailController.text.trim())) {
+              registerationController.registerWithEmail(image!.path);
+              _showDeleteConfirmationDialog();
+            }
           },
           title: 'Register',
         )

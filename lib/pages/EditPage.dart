@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -42,6 +44,8 @@ class _EditState extends State<EditPage> {
   TextEditingController _searchController = TextEditingController();
   List<IngredientList> _searchResults = [];
   List<IngredientList> IGDResults = [];
+  List<int> ingredientsId = [];
+  List<IngredientsId> ingredientsIdList = [];
   //List<IngredientList> _selectedResults = [];
   //bool _isSelected = false;
   List<IngredientList> _selectedIngredients = [];
@@ -123,10 +127,51 @@ class _EditState extends State<EditPage> {
     });
   }
 
+  Future<void> fetchPostDetails(int postId) async {
+    print(postId);
+    print(ingredientsId);
+    var url = Uri.parse('http://10.0.2.2:4000/post_data/$postId');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var jsonData = jsonDecode(response.body);
+      // ดึงข้อมูลเมนูอาหารและรายการส่วนผสมที่เกี่ยวข้อง
+      String postName = jsonData['post_name'];
+      String postDescription = jsonData['post_description'];
+      String postTypes = jsonData['post_types'];
+      List<int> ingredientsId = jsonData['ingredients_id'];
+
+      setState(() {
+        // ตั้งค่าค่าเริ่มต้นให้กับ TextController หรือตัวแปรที่ใช้ในการแสดงรายการที่มีอยู่แล้ว
+        postController.nameController.text = postName;
+        postController.descriptionController.text = postDescription;
+        postController.typeController.text = postTypes;
+        postController.IGDController.text =
+            widget.userP.ingredientsId.toString();
+        _selectedIngredients = IGDResults.where((ingredient) =>
+            ingredientsId.contains(ingredient.ingredientsId)).toList();
+      });
+    }
+  }
+
+  Future getBookmark() async {
+    var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
+    var response = await http.get(url);
+    IGDResults = ingredientListFromJson(response.body);
+
+    // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId
+    IGDResults =
+        IGDResults.where((element) => element.ingredientsId == ingredientsId)
+            .toList();
+
+    print(IGDResults);
+  }
+
   @override
   void initState() {
     super.initState();
-
+    getBookmark();
+    fetchPostDetails(widget.post_id);
     // Initialize text controllers with existing data
     postController.nameController.text = widget.userP.postName; // Populate name
     postController.typeController.text =
@@ -135,25 +180,9 @@ class _EditState extends State<EditPage> {
         widget.userP.postDescription; // Populate description
 
     postController.IGDController.text = widget.userP.ingredientsId.toString();
-
-    // Add existing ingredients to the selectedIngredients list
-    // for (var ingredientId in widget.userP.ingredientsId) {
-    //   // Find the IngredientList with a matching ingredientsId
-    //   IngredientList? matchingIngredient = IGDResults.firstWhere(
-    //     (ingredient) => ingredient.ingredientsId == ingredientId,
-    //     //orElse: () => null,
-    //   );
-
-    //   if (matchingIngredient != null) {
-    //     // Add the matching IngredientList object to _selectedIngredients
-    //     _selectedIngredients.add(matchingIngredient);
-    //   }
-    // }
-    image = XFile(widget.userP.postImage);
-
-    // You may also need to populate the selectedUnits list if it's related to existing data.
-
-    // Rest of your initState logic...
+    _selectedIngredients = IGDResults.where(
+            (ingredient) => ingredientsId.contains(ingredient.ingredientsId))
+        .toList();
     getIGD();
     _displaySelectedIngredientsChips();
   }
@@ -215,6 +244,23 @@ class _EditState extends State<EditPage> {
     });
   }
 
+  void saveUserImage() async {
+    print('saveUserImage function called');
+    // Get the token from SharedPreferences
+
+    // Call the method to save the user name and email
+    final PostController postController = Get.find();
+    await postController.patchPostImage(
+        image!.path, postId = widget.post_id); // ส่งรูปภาพด้วย
+
+    // Optionally, you can show a confirmation or success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('User data updated successfully'),
+      ),
+    );
+  }
+
   void submitPost() {
     if (image == null ||
         postController.nameController.text.isEmpty ||
@@ -237,6 +283,7 @@ class _EditState extends State<EditPage> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
+                  //postController.patchPostImage(image!.path);
                 },
               ),
             ],
@@ -249,16 +296,6 @@ class _EditState extends State<EditPage> {
     postController.IGDController.text = _selectedIngredients
         .map((ingredient) => ingredient.ingredientsId.toString())
         .join(',');
-
-    postController.updatePost(
-      postId = widget.post_id, // คุณควรกำหนด postId ที่คุณต้องการอัปเดต
-      name: postController.nameController.text,
-      description: postController.descriptionController.text,
-      type: postController.typeController.text,
-      image: image!.path,
-      ingredientsId: postController.IGDController.text,
-      selectedUnits: _selectedUnits,
-    );
   }
 
   // _getSavedToken() async {
@@ -307,6 +344,16 @@ class _EditState extends State<EditPage> {
         child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 245, 238, 255),
+      appBar: AppBar(
+        // automaticallyImplyLeading: false,
+        title: Text(
+          'แก้ไขโพสน์',
+          style: TextStyle(fontSize: 25),
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFF363062),
+        toolbarHeight: 60,
+      ),
       body: SingleChildScrollView(
         child: Container(
           decoration: BoxDecoration(
@@ -345,14 +392,13 @@ class _EditState extends State<EditPage> {
 
               //_buildSearchResults(),
 
-              Visibility(
-                visible: banned == 0,
-                child: SubmitButton(
-                  onPressed: () {
-                    submitPost();
-                  },
-                  title: 'CREATE',
-                ),
+              SubmitButton(
+                onPressed: () {
+                  //submitPost();
+                  //postController.patchPostImage(image!.path);
+                  saveUserImage();
+                },
+                title: 'CREATE',
               ),
             ],
           ),
@@ -384,16 +430,23 @@ class _EditState extends State<EditPage> {
                       height: 100,
                       fit: BoxFit.cover,
                     )
-                  : Align(
-                      alignment: Alignment.center, // จัดให้ Text อยู่ตรงกลาง
-                      child: Text(
-                        'เลือกรูปภาพของคุณ',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Color.fromARGB(255, 114, 26,
-                                236)), // ปรับแต่งขนาดตัวอักษรตามที่คุณต้องการ
-                      ),
-                    ),
+                  : widget.userP.postImage != null
+                      ? Image.network(
+                          'http://10.0.2.2:4000/uploadPostImage/${widget.userP.postImage}',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        )
+                      : Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'เลือกรูปภาพของคุณ',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 114, 26, 236),
+                            ),
+                          ),
+                        ),
             ),
           ),
         ),
@@ -554,6 +607,7 @@ class _EditState extends State<EditPage> {
                 children: _selectedIngredients.map((selectedIngredient) {
                   final index =
                       _selectedIngredients.indexOf(selectedIngredient);
+
                   return Row(
                     children: [
                       Container(

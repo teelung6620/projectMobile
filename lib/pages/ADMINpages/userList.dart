@@ -47,6 +47,13 @@ class _UserListState extends State<UserListPage> {
     // report = report.where((element) => element.userId == userId).toList();
   }
 
+  Future<List<User>> fetchUsers() async {
+    var url = Uri.parse("http://10.0.2.2:4000/login");
+    var response = await http.get(url);
+    List<User> users = userFromJson(response.body);
+    return users;
+  }
+
   Future<void> _printUserIdFromToken(String token) async {
     try {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
@@ -187,183 +194,240 @@ class _UserListState extends State<UserListPage> {
                 ),
               ),
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    await getUser(); // เรียกโค้ดการดึงข้อมูลเมื่อรีเฟรช
-                  },
-                  child: SingleChildScrollView(
-                    // physics: BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: userList.length,
-                          padding: EdgeInsets.all(8),
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            var reverseindex = userList.length - 1 - index;
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                  width: 20,
-                                  height: 130,
-                                  decoration: BoxDecoration(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8.0),
-                                                ),
-                                                child: Padding(
-                                                  padding: const EdgeInsets
-                                                          .only(
-                                                      top:
-                                                          10.0), // เพิ่มระยะห่างด้านบน
-                                                  child: CircleAvatar(
-                                                    backgroundImage:
-                                                        NetworkImage(
-                                                      'http://10.0.2.2:4000/uploadPostImage/${userList[reverseindex].userImage}',
-                                                    ),
-                                                    radius: 40,
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 10,
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 50.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment
-                                                  .start, // จัดเรียงข้อความด้านซ้าย
-                                              children: [
-                                                Text(
-                                                  userList[reverseindex]
-                                                      .userName,
-                                                  style: TextStyle(
-                                                    color:
-                                                        userList[reverseindex]
-                                                                    .banned ==
-                                                                1
-                                                            ? Colors.red
-                                                            : Colors.black,
-                                                    fontSize: 20,
-                                                  ),
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color: Color(0xFF363062),
-                                                      width: 2,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                    color: Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                                  ),
-                                                  padding: EdgeInsets.all(2),
-                                                  child: Text(
-                                                    userList[reverseindex]
-                                                        .userEmail,
-                                                    style: TextStyle(
-                                                        color:
-                                                            Color(0xFF363062),
-                                                        fontSize: 15),
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                                )
-                                              ],
+                  child: FutureBuilder<List<User>>(
+                      future: fetchUsers(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // กำลังโหลดข้อมูล - แสดง Loading Animation ที่คุณต้องการ
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          // หากเกิดข้อผิดพลาด
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else {
+                          // โหลดข้อมูลสำเร็จ - แสดงข้อมูลที่โหลด
+                          List<User> userList = snapshot.data!;
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              await getUser();
+                            },
+                            child: SingleChildScrollView(
+                              // physics: BouncingScrollPhysics(),
+                              child: Column(
+                                children: [
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: userList.length,
+                                    padding: EdgeInsets.all(8),
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      var reverseindex =
+                                          userList.length - 1 - index;
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                            width: 20,
+                                            height: 130,
+                                            decoration: BoxDecoration(
+                                              color: Color.fromARGB(
+                                                  255, 255, 255, 255),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                          ),
-                                          Spacer(),
-                                          Column(
-                                            children: [
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  bool confirmBan =
-                                                      await _showBanfirmationDialog();
-                                                  if (confirmBan) {
-                                                    await BannedController()
-                                                        .BanUser(
-                                                      userList[reverseindex]
-                                                          .userId,
-                                                    );
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8.0),
+                                                          ),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .only(
+                                                                    top:
+                                                                        10.0), // เพิ่มระยะห่างด้านบน
+                                                            child: CircleAvatar(
+                                                              backgroundImage:
+                                                                  NetworkImage(
+                                                                'http://10.0.2.2:4000/uploadPostImage/${userList[reverseindex].userImage}',
+                                                              ),
+                                                              radius: 40,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 50.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start, // จัดเรียงข้อความด้านซ้าย
+                                                        children: [
+                                                          Text(
+                                                            userList[
+                                                                    reverseindex]
+                                                                .userName,
+                                                            style: TextStyle(
+                                                              color: userList[reverseindex]
+                                                                          .banned ==
+                                                                      1
+                                                                  ? Colors.red
+                                                                  : Colors
+                                                                      .black,
+                                                              fontSize: 20,
+                                                            ),
+                                                            textAlign:
+                                                                TextAlign.left,
+                                                          ),
+                                                          SizedBox(
+                                                            height: 5,
+                                                          ),
+                                                          Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              border:
+                                                                  Border.all(
+                                                                color: Color(
+                                                                    0xFF363062),
+                                                                width: 2,
+                                                              ),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          5),
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      255,
+                                                                      255,
+                                                                      255,
+                                                                      255),
+                                                            ),
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    2),
+                                                            child: Text(
+                                                              userList[
+                                                                      reverseindex]
+                                                                  .userEmail,
+                                                              style: TextStyle(
+                                                                  color: Color(
+                                                                      0xFF363062),
+                                                                  fontSize: 15),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .left,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                    Column(
+                                                      children: [
+                                                        ElevatedButton(
+                                                          onPressed: () async {
+                                                            bool confirmBan =
+                                                                await _showBanfirmationDialog();
+                                                            if (confirmBan) {
+                                                              await BannedController()
+                                                                  .BanUser(
+                                                                userList[
+                                                                        reverseindex]
+                                                                    .userId,
+                                                              );
 
-                                                    setState(() {
-                                                      getUser(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
-                                                    });
-                                                  }
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      const Color.fromARGB(
-                                                          255, 255, 255, 255),
-                                                ),
-                                                child: Icon(
-                                                  Icons.airplanemode_active,
-                                                  color: Color(0xFF363062),
-                                                ),
-                                              ),
-                                              ElevatedButton(
-                                                onPressed: () async {
-                                                  bool confirmUnban =
-                                                      await _showUnbanConfirmationDialog();
-                                                  if (confirmUnban) {
-                                                    await BannedController()
-                                                        .UnBanUser(
-                                                      userList[reverseindex]
-                                                          .userId,
-                                                    );
+                                                              setState(() {
+                                                                getUser(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
+                                                              });
+                                                            }
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                const Color
+                                                                        .fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    255,
+                                                                    255),
+                                                          ),
+                                                          child: Icon(
+                                                            Icons
+                                                                .airplanemode_active,
+                                                            color: Color(
+                                                                0xFF363062),
+                                                          ),
+                                                        ),
+                                                        ElevatedButton(
+                                                          onPressed: () async {
+                                                            bool confirmUnban =
+                                                                await _showUnbanConfirmationDialog();
+                                                            if (confirmUnban) {
+                                                              await BannedController()
+                                                                  .UnBanUser(
+                                                                userList[
+                                                                        reverseindex]
+                                                                    .userId,
+                                                              );
 
-                                                    setState(() {
-                                                      getUser(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
-                                                    });
-                                                  }
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor:
-                                                      const Color.fromARGB(
-                                                          255, 255, 255, 255),
+                                                              setState(() {
+                                                                getUser(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
+                                                              });
+                                                            }
+                                                          },
+                                                          style: ElevatedButton
+                                                              .styleFrom(
+                                                            backgroundColor:
+                                                                const Color
+                                                                        .fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    255,
+                                                                    255),
+                                                          ),
+                                                          child: Icon(
+                                                            Icons
+                                                                .airplanemode_inactive,
+                                                            color: Color(
+                                                                0xFF363062),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
-                                                child: Icon(
-                                                  Icons.airplanemode_inactive,
-                                                  color: Color(0xFF363062),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  )),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              )
+                                              ],
+                                            )),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                      }))
             ],
           ),
         ),

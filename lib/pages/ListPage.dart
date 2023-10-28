@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/logoutButton.dart';
 import '../components/submitButton.dart';
@@ -344,7 +345,7 @@ class _ListState extends State<ListPage> {
                                           'http://10.0.2.2:4000/uploadPostImage/$userImage',
                                         )
                                       : NetworkImage(
-                                          'http://10.0.2.2:4000/uploadPostImage/coke.jpg'), // รูปภาพสำรอง
+                                          'http://10.0.2.2:4000/uploadPostImage/avatar.jpg'), // รูปภาพสำรอง
                                 ),
                                 SizedBox(
                                   width: 10,
@@ -865,53 +866,7 @@ class _ListState extends State<ListPage> {
                                           ],
                                         ),
                                       ],
-                                    )
-
-                                    // Align(
-                                    //   child: ListTile(
-                                    //     subtitleTextStyle: const TextStyle(
-                                    //       fontSize: 20,
-                                    //       fontWeight: FontWeight.normal,
-                                    //     ),
-                                    //     titleTextStyle: const TextStyle(
-                                    //       color: Colors.black,
-                                    //       fontSize: 25,
-                                    //       fontWeight: FontWeight.normal,
-                                    //     ),
-                                    //     leading: Expanded(
-                                    //       child: Image(
-                                    //         image: NetworkImage(
-                                    //           'http://10.0.2.2:4000/uploadPostImage/${newPosts[reverseindex].postImage}',
-                                    //         ),
-                                    //       ),
-                                    //     ),
-                                    //     title: Text(
-                                    //       newPosts[reverseindex].postName,
-                                    //       textAlign: TextAlign.left,
-                                    //     ),
-                                    //     subtitle: Text(
-                                    //       newPosts[reverseindex].userName,
-                                    //       textAlign: TextAlign.left,
-                                    //     ),
-                                    //     trailing: Container(
-                                    //       width:
-                                    //           100, // ปรับความกว้างของช่องแสดง totalCal ตามที่คุณต้องการ
-                                    //       alignment: Alignment
-                                    //           .centerRight, // จัดตำแหน่งข้อความที่ด้านขวา
-                                    //       child: newPosts[reverseindex].totalCal !=
-                                    //               null
-                                    //           ? Text(
-                                    //               "${newPosts[reverseindex].totalCal}",
-                                    //               style: TextStyle(
-                                    //                 fontSize: 18,
-                                    //                 fontWeight: FontWeight.bold,
-                                    //               ),
-                                    //             )
-                                    //           : SizedBox(),
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    ),
+                                    )),
                               ),
                             );
                           },

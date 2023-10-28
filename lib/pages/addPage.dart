@@ -450,20 +450,25 @@ class _AddState extends State<AddPage> {
                                 ),
                                 actions: <Widget>[
                                   ElevatedButton(
-                                    child: Text("Add"),
-                                    onPressed: () {
-                                      int units =
-                                          int.tryParse(unitController.text) ??
-                                              0;
-                                      if (units > 0) {
-                                        setState(() {
-                                          _selectedIngredients.add(result);
-                                          _selectedUnits.add(units);
-                                        });
-                                      }
-                                      Navigator.of(context).pop();
-                                    },
-                                  ),
+                                      child: Text("Add"),
+                                      onPressed: () {
+                                        int units =
+                                            int.tryParse(unitController.text) ??
+                                                0;
+                                        if (units > 0) {
+                                          setState(() {
+                                            _selectedIngredients.add(result);
+                                            _selectedUnits.add(units);
+                                          });
+                                        }
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                          Color.fromARGB(255, 103, 23, 173),
+                                        ),
+                                      )),
                                 ],
                               );
                             },

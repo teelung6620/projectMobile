@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/input_textfield.dart';
 import '../components/my_textfield2.dart';
 import '../components/submitButton.dart';
+import '../model/user.dart';
 import '../model/userPost.dart';
 import 'package:flutter/src/rendering/box.dart';
 import '../model/teamTest.dart';
@@ -40,6 +41,7 @@ class _DetailState extends State<DetailPage> {
   List<ScoreList> scorelist = [];
   int? userId;
   int? postId;
+  int? banned;
 
   Future getScore() async {
     var url = Uri.parse("http://10.0.2.2:4000/scores");
@@ -59,8 +61,9 @@ class _DetailState extends State<DetailPage> {
     try {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
       userId = int.tryParse(decodedToken['user_id'].toString());
-
+      banned = decodedToken['banned'];
       print(userId);
+      print(banned);
 
       // เรียกดึง bookmark และ post ในนี้หลังจากกำหนดค่า userId แล้ว
       // await getBookmark();
@@ -85,6 +88,19 @@ class _DetailState extends State<DetailPage> {
       });
     } else {
       throw Exception('Failed to load comments');
+    }
+  }
+
+  Future<void> _checkUserStatus() async {
+    // เรียก API หรือดึงข้อมูลผู้ใช้เพื่อตรวจสอบสถานะ banned
+    // ตรวจสอบสถานะ banned ของผู้ใช้โดยใช้ค่าที่ได้จาก API หรือข้อมูลผู้ใช้
+
+    var url = Uri.parse("http://10.0.2.2:4000/login");
+    var response = await http.get(url);
+    List<User> userResults = userFromJson(response.body);
+
+    if (userResults.isNotEmpty) {
+      bool isBanned = banned == 1; // เช็คว่า banned เป็น 1 หรือไม่
     }
   }
 
@@ -383,21 +399,42 @@ class _DetailState extends State<DetailPage> {
                   SizedBox(
                     height: 5,
                   ),
-
                   Center(
-                      child: InputTextFieldWidget(
-                          commentsController.commentlineController,
-                          'Add a comment...')),
+                    child: Visibility(
+                        visible: banned == 1,
+                        child: Column(
+                          children: [
+                            Text(
+                              'คุณถูกแบน',
+                              style: TextStyle(fontSize: 20, color: Colors.red),
+                            ),
+                            Text(
+                              'คุณไม่สามารถคอมเมนต์ได้',
+                              style: TextStyle(fontSize: 15, color: Colors.red),
+                            ),
+                          ],
+                        )),
+                  ),
+                  Center(
+                    child: Visibility(
+                        visible: banned == 0,
+                        child: InputTextFieldWidget(
+                            commentsController.commentlineController,
+                            'Add a comment...')),
+                  ),
                   SizedBox(
                     height: 15,
                   ),
                   Center(
-                    child: CommentButton(
-                      onPressed: () {
-                        commentsController.commentsUser(widget.userP
-                            .postId); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
-                      },
-                      title: 'Comment',
+                    child: Visibility(
+                      visible: banned == 0,
+                      child: CommentButton(
+                        onPressed: () {
+                          commentsController.commentsUser(widget.userP
+                              .postId); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
+                        },
+                        title: 'Comment',
+                      ),
                     ),
                   ),
 

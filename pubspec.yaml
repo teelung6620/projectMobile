@@ -46,6 +46,7 @@ dependencies:
     google_nav_bar: ^5.0.6
     jwt_decoder: ^2.0.1
     dio: ^5.3.3
+    loading_animation_widget:
 
 dev_dependencies:
     flutter_test:

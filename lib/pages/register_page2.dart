@@ -52,6 +52,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           content: TextField(
             controller: registerationController.verifyController,
             keyboardType: TextInputType.number,
+            maxLength: 4,
           ),
           actions: <Widget>[
             ElevatedButton(
@@ -200,11 +201,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         SubmitButton(
           onPressed: () {
-            if (!userList.any((user) =>
-                user.userEmail !=
-                registerationController.emailController.text.trim())) {
-              registerationController.registerWithEmail(image!.path);
-              _showDeleteConfirmationDialog();
+            if (registerationController.nameController.text.isNotEmpty &&
+                registerationController.emailController.text.isNotEmpty &&
+                registerationController.passwordController.text.isNotEmpty &&
+                image != null) {
+              if (!userList.any((user) =>
+                  user.userEmail ==
+                  registerationController.emailController.text.trim())) {
+                registerationController.registerWithEmail(image!.path);
+                _showDeleteConfirmationDialog();
+              }
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Colors.white,
+                  title: Text('แจ้งเตือน'),
+                  content: Text('กรุณากรอกข้อมูลให้ครบถ้วน'),
+                  actions: <Widget>[
+                    ElevatedButton(
+                      child: Text('OK'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Color.fromARGB(255, 103, 23, 173),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // ปิด AlertDialog
+                      },
+                    ),
+                  ],
+                ),
+              );
             }
           },
           title: 'Register',

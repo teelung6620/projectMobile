@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
           content: TextField(
             controller: registerationController.verifyController,
             keyboardType: TextInputType.number,
+            maxLength: 4,
           ),
           actions: <Widget>[
             ElevatedButton(
@@ -143,6 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
           onPressed: () => {
             loginController.loginWithEmail(),
             //_showDeleteConfirmationDialog()
+            _showDeleteConfirmationDialog()
           },
           title: 'Login',
         )

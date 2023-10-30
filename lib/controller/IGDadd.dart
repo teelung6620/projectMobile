@@ -93,4 +93,82 @@ class IGDController extends GetxController {
       );
     }
   }
+
+  Future<void> deleteIGD({required int ingredientID}) async {
+    try {
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + '/DELingredients/$ingredientID');
+      Map<String, dynamic> body = {
+        'ingredients_id': ingredientID,
+      };
+
+      final request = http.Request('DELETE', url);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(body);
+
+      final response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        // แบนผู้ใช้สำเร็จ
+        print("สำเร็จ");
+        // ทำอย่างอื่นที่คุณต้องการหลังจากการแบนผู้ใช้
+      } else {
+        // ไม่สามารถแบนผู้ใช้
+        print("ไม่ลบได้");
+        // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+      }
+    } catch (error) {
+      // ข้อผิดพลาดในการเชื่อมต่อหรือร้องขอ
+      print("เกิดข้อผิดพลาดในการเชื่อมต่อหรือร้องขอ: $error");
+      // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+    }
+  }
+
+  Future<void> patchIGD(int ingredientID) async {
+    try {
+      var headers = {
+        'Content-Type': 'application/json',
+      };
+      var url =
+          Uri.parse(ApiEndPoints.baseUrl + '/ingredients_data/$ingredientID');
+
+      Map<String, dynamic> body = {
+        'ingredients_name': nameController.text.trim(),
+        'ingredients_units': unitController.text.trim(),
+        'ingredients_unitsName': unitNameController.text.trim(),
+        'ingredients_cal': calController.text.trim(),
+      };
+
+      final request = http.Request('PATCH', url);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(body);
+
+      final response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        // แบนผู้ใช้สำเร็จ
+        print("สำเร็จ");
+        // ทำอย่างอื่นที่คุณต้องการหลังจากการแบนผู้ใช้
+      } else {
+        // ไม่สามารถแบนผู้ใช้
+        print("ไม่สำเร็จ");
+        // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+      }
+    } catch (e) {
+      Get.back();
+      showDialog(
+        context: Get.context!,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text('เกิดข้อผิดพลาด'),
+            contentPadding: EdgeInsets.all(20),
+            children: [Text(e.toString())],
+          );
+        },
+      );
+    }
+  }
 }

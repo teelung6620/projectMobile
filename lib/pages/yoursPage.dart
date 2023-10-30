@@ -78,13 +78,12 @@ class _YourState extends State<YourPages> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('ยืนยันการลบโพสน์'),
-          content: Text('คุณต้องการลบโพสน์นี้ ใช่หรือไม่?'),
+          title: Text('ยืนยันการลบโพสต์'),
+          content: Text('คุณต้องการลบโพสต์นี้ ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
                 foregroundColor: Colors.white,
               ),
               onPressed: () {
@@ -94,8 +93,7 @@ class _YourState extends State<YourPages> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
                 foregroundColor: Colors.white,
               ),
               onPressed: () {

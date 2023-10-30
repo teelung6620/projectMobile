@@ -47,7 +47,7 @@ class _ReportState extends State<ReportPage> {
       builder: (context) {
         return AlertDialog(
           title: Text('ยืนยันการแบน'),
-          content: Text('คุณต้องการแบนผู้ใช้นี้ใช่หรือไม่?'),
+          content: Text('คุณต้องการแบนโพสต์นี้ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -81,7 +81,7 @@ class _ReportState extends State<ReportPage> {
       builder: (context) {
         return AlertDialog(
           title: Text('ยืนยันการปลดแบน'),
-          content: Text('คุณต้องการปลดแบนผู้ใช้นี้ใช่หรือไม่?'),
+          content: Text('คุณต้องการปลดแบนโพสต์นี้ใช่หรือไม่?'),
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -497,61 +497,78 @@ class _ReportState extends State<ReportPage> {
                                                 //     color: Color(0xFF363062),
                                                 //   ),
                                                 // ),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    bool confirmBan =
-                                                        await _showBanfirmationDialog();
-                                                    if (confirmBan) {
-                                                      await BannedController()
-                                                          .BanPost(
-                                                        postId:
-                                                            posts[reverseindex]
-                                                                .postId,
-                                                      );
+                                                Visibility(
+                                                  visible: posts[reverseindex]
+                                                          .banned !=
+                                                      1,
+                                                  child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      bool confirmBan =
+                                                          await _showBanfirmationDialog();
+                                                      if (confirmBan) {
+                                                        await BannedController()
+                                                            .BanPost(
+                                                          postId: posts[
+                                                                  reverseindex]
+                                                              .postId,
+                                                        );
 
-                                                      setState(() {
-                                                        getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
-                                                      });
-                                                      print(postId);
-                                                    }
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        const Color.fromARGB(
-                                                            255, 255, 255, 255),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.airplanemode_active,
-                                                    color: Color(0xFF363062),
+                                                        setState(() {
+                                                          getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
+                                                        });
+                                                        print(postId);
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              255),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.airplanemode_active,
+                                                      color: Color(0xFF363062),
+                                                    ),
                                                   ),
                                                 ),
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    bool confirmUnban =
-                                                        await _showUnbanConfirmationDialog();
-                                                    if (confirmUnban) {
-                                                      await BannedController()
-                                                          .UnBanPost(
-                                                        postId:
-                                                            posts[reverseindex]
-                                                                .postId,
-                                                      );
+                                                Visibility(
+                                                  visible: posts[reverseindex]
+                                                          .banned ==
+                                                      1,
+                                                  child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      bool confirmUnban =
+                                                          await _showUnbanConfirmationDialog();
+                                                      if (confirmUnban) {
+                                                        await BannedController()
+                                                            .UnBanPost(
+                                                          postId: posts[
+                                                                  reverseindex]
+                                                              .postId,
+                                                        );
 
-                                                      setState(() {
-                                                        getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
-                                                      });
-                                                    }
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        const Color.fromARGB(
-                                                            255, 255, 255, 255),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.airplanemode_inactive,
-                                                    color: Color(0xFF363062),
+                                                        setState(() {
+                                                          getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
+                                                        });
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              255),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons
+                                                          .airplanemode_inactive,
+                                                      color: Color(0xFF363062),
+                                                    ),
                                                   ),
                                                 ),
                                               ],

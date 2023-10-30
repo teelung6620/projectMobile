@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/logoutButton.dart';
 import '../components/submitButton.dart';
 import '../constant/constants.dart';
+import '../controller/bannedController.dart';
 import '../controller/bookmarkController.dart';
 import '../controller/post_controller.dart';
 import '../model/Ingredients.list.dart';
@@ -79,6 +80,40 @@ class _ListState extends State<ListPage> {
     } catch (error) {
       print('Error decoding token: $error');
     }
+  }
+
+  Future _showBanfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('ยืนยันการแบน'),
+          content: Text('คุณต้องการแบนโพสต์นี้ใช่หรือไม่?'),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ยกเลิกการลบ
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF363062), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true); // ยืนยันการลบ
+              },
+              child: Text('ยืนยัน'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> getUser() async {
@@ -823,48 +858,77 @@ class _ListState extends State<ListPage> {
                                                     ),
                                                   ),
                                                 ),
-                                                Visibility(
-                                                  visible: userType == "admin",
-                                                  child: ElevatedButton(
-                                                    onPressed: () async {
-                                                      if (userType == "admin") {
-                                                        // ตรวจสอบว่า user_type เป็น "admin" หรือไม่
-                                                        bool confirmDelete =
-                                                            await _showDeleteConfirmationDialog();
-                                                        if (confirmDelete) {
-                                                          await PostController()
-                                                              .deletePost(posts[
-                                                                      reverseindex]
-                                                                  .postId);
-                                                          setState(() {
-                                                            getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
-                                                          });
-                                                          Get.snackbar(
-                                                            'สำเร็จ',
-                                                            'ลบโพสน์ของ ${posts[reverseindex].userName} แล้ว',
-                                                            snackPosition:
-                                                                SnackPosition
-                                                                    .TOP,
-                                                          );
-                                                        }
-                                                      }
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          const Color.fromARGB(
-                                                              255,
-                                                              255,
-                                                              255,
-                                                              255),
-                                                    ),
-                                                    child: Icon(
-                                                      Icons
-                                                          .delete_forever_sharp,
-                                                      color: Color(0xFF363062),
-                                                    ),
+                                                // Visibility(
+                                                //   visible: userType == "admin",
+                                                //   child: ElevatedButton(
+                                                //     onPressed: () async {
+                                                //       if (userType == "admin") {
+                                                //         // ตรวจสอบว่า user_type เป็น "admin" หรือไม่
+                                                //         bool confirmDelete =
+                                                //             await _showDeleteConfirmationDialog();
+                                                //         if (confirmDelete) {
+                                                //           await PostController()
+                                                //               .deletePost(posts[
+                                                //                       reverseindex]
+                                                //                   .postId);
+                                                //           setState(() {
+                                                //             getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
+                                                //           });
+                                                //           Get.snackbar(
+                                                //             'สำเร็จ',
+                                                //             'ลบโพสน์ของ ${posts[reverseindex].userName} แล้ว',
+                                                //             snackPosition:
+                                                //                 SnackPosition
+                                                //                     .TOP,
+                                                //           );
+                                                //         }
+                                                //       }
+                                                //     },
+                                                //     style: ElevatedButton
+                                                //         .styleFrom(
+                                                //       backgroundColor:
+                                                //           const Color.fromARGB(
+                                                //               255,
+                                                //               255,
+                                                //               255,
+                                                //               255),
+                                                //     ),
+                                                //     child: Icon(
+                                                //       Icons
+                                                //           .delete_forever_sharp,
+                                                //       color: Color(0xFF363062),
+                                                //     ),
+                                                //   ),
+                                                // )
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    bool confirmBan =
+                                                        await _showBanfirmationDialog();
+                                                    if (confirmBan) {
+                                                      await BannedController()
+                                                          .BanPost(
+                                                        postId:
+                                                            posts[reverseindex]
+                                                                .postId,
+                                                      );
+
+                                                      setState(() {
+                                                        getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
+                                                      });
+                                                      //print(postId);
+                                                    }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            255, 255, 255, 255),
                                                   ),
-                                                )
+                                                  child: Icon(
+                                                    Icons.airplanemode_active,
+                                                    color: Color(0xFF363062),
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           ],

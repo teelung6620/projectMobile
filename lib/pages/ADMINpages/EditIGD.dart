@@ -8,7 +8,6 @@ import 'package:project_mobile/controller/IGDadd.dart';
 import 'package:project_mobile/controller/post_controller.dart';
 import 'package:project_mobile/model/BookMark.dart';
 import 'package:project_mobile/model/Ingredients.list.dart';
-import 'package:project_mobile/pages/ADMINpages/EditIGD.dart';
 import 'package:project_mobile/pages/homeTest.dart';
 import 'package:project_mobile/pages/login_page2.dart';
 import 'package:project_mobile/pages/registTest.dart';
@@ -18,13 +17,27 @@ import 'package:http/http.dart' as http;
 import '../../components/input_textfield.dart';
 import '../../components/submitButton.dart';
 
-class AddIGDPage extends StatefulWidget {
-  AddIGDPage({Key? key}) : super(key: key);
+class EditIGDPage extends StatefulWidget {
+  final String ingredientsName;
+  final int ingredientsUnits;
+  final IngredientsUnitsName ingredientsUnitsName;
+  final int ingredientsCal;
+  final int ingredientsId;
+  EditIGDPage({
+    Key? key,
+    required this.ingredientsName,
+    required this.ingredientsUnits,
+    required this.ingredientsUnitsName,
+    required this.ingredientsCal,
+    required this.ingredientsId,
+  }) : super(
+          key: key,
+        );
   @override
-  State<AddIGDPage> createState() => _AddIGDState();
+  State<EditIGDPage> createState() => _EditIGDState();
 }
 
-class _AddIGDState extends State<AddIGDPage> {
+class _EditIGDState extends State<EditIGDPage> {
   IGDController igdController = Get.put(IGDController());
   String _selectedItem = 'กรัม';
   List<String> unitNameOptions = ['กรัม', 'ฟอง', 'ช้อนชา', 'ถ้วย'];
@@ -43,9 +56,55 @@ class _AddIGDState extends State<AddIGDPage> {
     });
   }
 
+  Future _showDeleteConfirmationDialog() async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('ยืนยันการเปลี่ยนแปลง'),
+          content: Text('คุณต้องการเปลี่ยนแปลงข้อมูลนี้ ใช่หรือไม่?'),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(false); // ยกเลิกการลบ
+              },
+              child: Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    Color.fromARGB(255, 108, 37, 207), // สีพื้นหลังของปุ่ม
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                igdController.patchIGD(widget.ingredientsId);
+
+                // if (image != null) {
+                //   saveUserImage();
+                // }
+                Navigator.of(context).pop(true); // ยืนยันการลบ
+              },
+              child: Text('ยืนยัน'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
+    igdController.nameController.text = widget.ingredientsName;
+    igdController.unitController.text = widget.ingredientsUnits.toString();
+    igdController.unitNameController.text =
+        widget.ingredientsUnitsName.toString();
+    igdController.calController.text = widget.ingredientsCal.toString();
     getIGD();
     //_selectedItem;
   }
@@ -56,42 +115,22 @@ class _AddIGDState extends State<AddIGDPage> {
         child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFF4D4C7D),
+      appBar: AppBar(
+        // automaticallyImplyLeading: false,
+        title: Text(
+          'แก้ไขส่วนผสม',
+          style: TextStyle(fontSize: 25),
+        ),
+        centerTitle: true,
+        backgroundColor: Color(0xFF363062),
+        toolbarHeight: 60,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 10),
             SizedBox(
               height: 10,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                // gradient: LinearGradient(
-                //   colors: [
-                //     Color.fromARGB(255, 63, 12, 124), // สีบน
-                //     Color.fromARGB(255, 175, 110, 255), // สีล่าง
-                //   ],
-                //   begin: Alignment.topLeft,
-                //   end: Alignment.bottomRight,
-                // ),
-                color: Color(0xFF363062),
-                // border: Border.all(
-                //   color: Colors.black, // สีขอบ
-                //   width: 2.0, // ความหนาขอบ
-                // ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0), // ความโค้งขอบ
-                ),
-              ),
-              padding: EdgeInsets.all(20.0), // ความห่างระหว่างขอบและเนื้อหา
-
-              child: Text(
-                'ADD INGREDIENT',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFF5F5F5)),
-              ),
             ),
 
             // MyTextField2(
@@ -109,23 +148,11 @@ class _AddIGDState extends State<AddIGDPage> {
 
             //_buildSearchResults(),
             SubmitButton(
-              onPressed: () {
-                if (igdController.nameController.text.isEmpty ||
-                    igdController.unitController.text.isEmpty ||
-                    igdController.unitNameController.text.isEmpty ||
-                    igdController.calController.text.isEmpty) {
-                  // แจ้งเตือนผู้ใช้ให้กรอกข้อมูลให้ครบถ้วน
-                  Get.snackbar(
-                    'แจ้งเตือน',
-                    'กรุณากรอกข้อมูลให้ครบถ้วน',
-                    snackPosition: SnackPosition.TOP,
-                  );
-                } else {
-                  igdController.IGDadder();
-                }
-              },
-              title: 'เพิ่ม',
-            ),
+                onPressed: () {
+                  // Call the method to save the user name
+                  _showDeleteConfirmationDialog();
+                },
+                title: 'SAVE'),
           ],
         ),
       ),
@@ -263,116 +290,6 @@ class _AddIGDState extends State<AddIGDPage> {
         ),
         SizedBox(
           height: 20,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color.fromARGB(255, 255, 255, 255),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Color.fromARGB(255, 147, 91, 251),
-              ),
-              hintText: 'ค้นหาส่วนผสมที่ต้องการ',
-              contentPadding: EdgeInsets.only(
-                left: 15.0,
-              ),
-            ),
-            onChanged: (query) {
-              setState(() {
-                _searchResults = IGDResults.where((result) => result
-                    .ingredientsName
-                    .toLowerCase()
-                    .contains(query.toLowerCase())).toList();
-              });
-            },
-            controller: _searchController,
-            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-          ),
-        ),
-        Container(
-          height: 350,
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: _searchResults.length,
-            itemBuilder: (context, index) {
-              final result = _searchResults.reversed.toList()[index];
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(width: 18.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Chip(
-                        backgroundColor: Color(0xFF363062),
-                        key: ValueKey(result),
-                        label: Text(
-                          result.ingredientsName +
-                              ' ' +
-                              result.ingredientsUnits.toString() +
-                              ' ' +
-                              (ingredientsUnitsNameValues
-                                      .reverse[result.ingredientsUnitsName] ??
-                                  '') +
-                              ' ' +
-                              result.ingredientsCal.toString() +
-                              '  แคลอรี่',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 255, 255, 255)),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () async {
-                          final shouldRefreshData = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditIGDPage(
-                                ingredientsName: result.ingredientsName,
-                                ingredientsCal: result.ingredientsCal,
-                                ingredientsUnits: result.ingredientsUnits,
-                                ingredientsUnitsName:
-                                    result.ingredientsUnitsName,
-                                ingredientsId: result.ingredientsId,
-                              ),
-                            ),
-                          );
-
-                          if (shouldRefreshData == true) {
-                            setState(() {
-                              getIGD();
-                            });
-                          }
-                        },
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ), // ใส่ไอคอนลบ (หรืออื่น ๆ ตามที่คุณต้องการ)
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // เรียกใช้ฟังก์ชัน deleteIGD เพื่อลบรายการส่วนประกอบ
-                          IGDController()
-                              .deleteIGD(ingredientID: result.ingredientsId);
-                          setState(() {
-                            getIGD();
-                          });
-                        },
-                        icon: Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ), // ใส่ไอคอนลบ (หรืออื่น ๆ ตามที่คุณต้องการ)
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
         ),
       ],
     );

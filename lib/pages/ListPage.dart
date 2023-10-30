@@ -52,6 +52,7 @@ class _ListState extends State<ListPage> {
   String? userImage;
   String? userType;
   String? userPassword;
+  int? banned;
 
   Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -605,6 +606,9 @@ class _ListState extends State<ListPage> {
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
                             var reverseindex = newPosts.length - 1 - index;
+                            if (newPosts[reverseindex].banned == 1) {
+                              return SizedBox.shrink(); // ซ่อนโพสต์ที่ถูกแบน
+                            }
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Container(

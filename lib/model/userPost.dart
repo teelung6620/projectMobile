@@ -23,6 +23,7 @@ class UserPost {
   String? averageScore;
   int numOfScores;
   int totalCal;
+  int banned;
 
   UserPost({
     required this.postId,
@@ -37,6 +38,7 @@ class UserPost {
     required this.averageScore,
     required this.numOfScores,
     required this.totalCal,
+    required this.banned,
   });
 
   factory UserPost.fromJson(Map<String, dynamic> json) => UserPost(
@@ -53,6 +55,7 @@ class UserPost {
         averageScore: json["average_score"],
         numOfScores: json["num_of_scores"],
         totalCal: json["totalCal"],
+        banned: json["banned"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -69,6 +72,7 @@ class UserPost {
         "average_score": averageScore,
         "num_of_scores": numOfScores,
         "totalCal": totalCal,
+        "banned": banned,
       };
 }
 

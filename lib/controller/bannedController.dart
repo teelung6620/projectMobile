@@ -72,4 +72,77 @@ class BannedController extends GetxController {
       // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
     }
   }
+
+  Future<void> BanPost({required int postId}) async {
+    final SharedPreferences? prefs = await _prefs;
+    final token = prefs?.getString('token');
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    try {
+      var url = Uri.parse(ApiEndPoints.baseUrl + '/BANpost/$postId');
+
+      Map<String, dynamic> body = {
+        'post_id': postId,
+      };
+
+      final request = http.Request('PUT', url);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(body);
+
+      final response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        // แบนผู้ใช้สำเร็จ
+        print("แบนผู้ใช้สำเร็จ");
+        // ทำอย่างอื่นที่คุณต้องการหลังจากการแบนผู้ใช้
+      } else {
+        // ไม่สามารถแบนผู้ใช้
+        print("ไม่สามารถแบนผู้ใช้");
+        // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+      }
+    } catch (error) {
+      // ข้อผิดพลาดในการเชื่อมต่อหรือร้องขอ
+      print("เกิดข้อผิดพลาดในการเชื่อมต่อหรือร้องขอ: $error");
+      // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+    }
+  }
+
+  Future<void> UnBanPost({required int postId}) async {
+    final SharedPreferences? prefs = await _prefs;
+    final token = prefs?.getString('token');
+    var headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    try {
+      var url = Uri.parse(ApiEndPoints.baseUrl + '/UNBANpost/$postId');
+      Map<String, dynamic> body = {
+        'post_id': postId,
+      };
+
+      final request = http.Request('PUT', url);
+      request.headers.addAll(headers);
+      request.body = jsonEncode(body);
+
+      final response = await http.Response.fromStream(await request.send());
+
+      if (response.statusCode == 200) {
+        // แบนผู้ใช้สำเร็จ
+        print("ปลดแบนผู้ใช้สำเร็จ");
+        // ทำอย่างอื่นที่คุณต้องการหลังจากการแบนผู้ใช้
+      } else {
+        // ไม่สามารถแบนผู้ใช้
+        print("ไม่สามารถปลดแบนผู้ใช้");
+        // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+      }
+    } catch (error) {
+      // ข้อผิดพลาดในการเชื่อมต่อหรือร้องขอ
+      print("เกิดข้อผิดพลาดในการเชื่อมต่อหรือร้องขอ: $error");
+      // จัดการข้อผิดพลาดหรือแจ้งเตือนให้ผู้ใช้ทราบตามที่คุณต้องการ
+    }
+  }
 }

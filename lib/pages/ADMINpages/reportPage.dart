@@ -115,11 +115,13 @@ class _ReportState extends State<ReportPage> {
     posts = userPostFromJson(response.body);
 
     setState(() {
-      // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId และ postId ตรงกับ bookmark
-      posts = posts
-          .where((element) =>
-              report.any((reportItem) => reportItem.postId == element.postId))
-          .toList();
+      // กรองเฉพาะโพสต์ที่มี user_id ตรงกับ userId และ postId ตรงกับ bookmark และ banned == 1
+      posts = posts.where((element) {
+        final isBanned = element.banned == 1;
+        final isMatchingReport =
+            report.any((reportItem) => reportItem.postId == element.postId);
+        return isMatchingReport || isBanned;
+      }).toList();
 
       posts.forEach((element) {
         imagesUrl.add(element.postImage);

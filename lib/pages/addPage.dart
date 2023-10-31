@@ -168,6 +168,7 @@ class _AddState extends State<AddPage> {
     if (image == null ||
         postController.nameController.text.isEmpty ||
         _selectedIngredients.isEmpty ||
+        postController.typeController.text.isEmpty ||
         postController.descriptionController.text.isEmpty) {
       showDialog(
         context: context,
@@ -182,8 +183,7 @@ class _AddState extends State<AddPage> {
                   'OK',
                 ),
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      Color.fromARGB(255, 103, 23, 173)),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF363062)),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -332,8 +332,8 @@ class _AddState extends State<AddPage> {
                         'เลือกรูปภาพของคุณ',
                         style: TextStyle(
                             fontSize: 20,
-                            color: Color.fromARGB(255, 114, 26,
-                                236)), // ปรับแต่งขนาดตัวอักษรตามที่คุณต้องการ
+                            color: Color(
+                                0xFF363062)), // ปรับแต่งขนาดตัวอักษรตามที่คุณต้องการ
                       ),
                     ),
             ),
@@ -401,7 +401,7 @@ class _AddState extends State<AddPage> {
                   children: [
                     SizedBox(width: 18.0),
                     ChoiceChip(
-                      backgroundColor: Color.fromARGB(255, 230, 210, 255),
+                      backgroundColor: Color.fromARGB(255, 255, 255, 255),
                       key: ValueKey(result),
                       label: Text(
                         result.ingredientsName,
@@ -466,7 +466,7 @@ class _AddState extends State<AddPage> {
                                       style: ButtonStyle(
                                         backgroundColor:
                                             MaterialStateProperty.all(
-                                          Color.fromARGB(255, 103, 23, 173),
+                                          Color(0xFF363062),
                                         ),
                                       )),
                                 ],
@@ -602,13 +602,13 @@ class _AddState extends State<AddPage> {
             Container(
               height: 25,
               decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 206, 167, 255),
+                  color: Color(0xFF363062),
                   borderRadius: BorderRadius.circular(10)),
               child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: DropdownButton(
                     value: _selectedItem,
-                    dropdownColor: Color.fromARGB(255, 206, 167, 255),
+                    dropdownColor: Color(0xFF363062),
                     style: TextStyle(color: Colors.white, fontSize: 15),
                     iconEnabledColor: Colors.white,
                     items: typeOptions.map((String option) {

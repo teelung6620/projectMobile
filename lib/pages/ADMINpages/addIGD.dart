@@ -46,6 +46,7 @@ class _AddIGDState extends State<AddIGDPage> {
   @override
   void initState() {
     super.initState();
+    igdController.unitNameController.text = 'กรัม';
     getIGD();
     //_selectedItem;
   }
@@ -349,7 +350,7 @@ class _AddIGDState extends State<AddIGDPage> {
                           }
                         },
                         icon: Icon(
-                          Icons.delete,
+                          Icons.edit,
                           color: Colors.white,
                         ), // ใส่ไอคอนลบ (หรืออื่น ๆ ตามที่คุณต้องการ)
                       ),

@@ -26,7 +26,7 @@ class InputTextFieldMultipleWidget extends StatelessWidget {
         controller: textEditingController,
         decoration: new InputDecoration.collapsed(
           hintText: hintText,
-          hintStyle: TextStyle(color: Color.fromARGB(255, 180, 143, 209)),
+          hintStyle: TextStyle(color: Color.fromARGB(255, 148, 148, 148)),
         ),
       ),
     );

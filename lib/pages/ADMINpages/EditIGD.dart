@@ -102,10 +102,10 @@ class _EditIGDState extends State<EditIGDPage> {
     super.initState();
     igdController.nameController.text = widget.ingredientsName;
     igdController.unitController.text = widget.ingredientsUnits.toString();
-    igdController.unitNameController.text =
-        widget.ingredientsUnitsName.toString();
+    igdController.unitNameController.text = _selectedItem;
     igdController.calController.text = widget.ingredientsCal.toString();
     getIGD();
+    // _selectedItem = igdController.unitNameController.text;
     //_selectedItem;
   }
 

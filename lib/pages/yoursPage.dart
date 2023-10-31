@@ -324,32 +324,32 @@ class _YourState extends State<YourPages> {
                                               ),
                                             ),
                                             Spacer(),
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        EditPage(
-                                                      userP:
-                                                          posts[reverseindex],
-                                                      post_id:
-                                                          posts[reverseindex]
-                                                              .postId,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                              ),
-                                              child: Icon(
-                                                Icons.edit,
-                                                color: Color(0xFF363062),
-                                              ),
-                                            ),
+                                            // ElevatedButton(
+                                            //   onPressed: () {
+                                            //     Navigator.push(
+                                            //       context,
+                                            //       MaterialPageRoute(
+                                            //         builder: (context) =>
+                                            //             EditPage(
+                                            //           userP:
+                                            //               posts[reverseindex],
+                                            //           post_id:
+                                            //               posts[reverseindex]
+                                            //                   .postId,
+                                            //         ),
+                                            //       ),
+                                            //     );
+                                            //   },
+                                            //   style: ElevatedButton.styleFrom(
+                                            //     backgroundColor:
+                                            //         const Color.fromARGB(
+                                            //             255, 255, 255, 255),
+                                            //   ),
+                                            //   child: Icon(
+                                            //     Icons.edit,
+                                            //     color: Color(0xFF363062),
+                                            //   ),
+                                            // ),
                                             ElevatedButton(
                                               onPressed: () async {
                                                 bool confirmDelete =

@@ -141,10 +141,20 @@ class _LoginScreenState extends State<LoginScreen> {
           height: 20,
         ),
         SubmitButton(
-          onPressed: () => {
-            loginController.loginWithEmail(),
-            //_showDeleteConfirmationDialog()
-            _showDeleteConfirmationDialog()
+          onPressed: () {
+            if (loginController.emailController.text.isNotEmpty &&
+                loginController.passwordController.text.isNotEmpty) {
+              // เช็คให้แน่ใจว่า Email และ Password ถูกกรอก
+              loginController.loginWithEmail(); // เริ่มกระบวนการเข้าสู่ระบบ
+              _showDeleteConfirmationDialog();
+            } else {
+              // หากไม่มี Email หรือ Password ให้แสดงข้อความผิดพลาด
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('กรุณากรอก Email และ Password ให้ครบถ้วน'),
+                ),
+              );
+            }
           },
           title: 'Login',
         )

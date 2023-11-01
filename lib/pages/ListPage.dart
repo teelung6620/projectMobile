@@ -61,6 +61,27 @@ class _ListState extends State<ListPage> {
     Get.offAll(LoginScreen());
   }
 
+  void _toggleChip(String chipType) {
+    setState(() {
+      if (chipType == 'ALL') {
+        // ถ้าเลือก "all", ยกเลิกทั้ง 3 อัน
+        selectedChips.clear();
+      } else {
+        if (selectedChips.contains(chipType)) {
+          selectedChips.remove(chipType);
+        } else {
+          selectedChips.add(chipType);
+        }
+
+        // ถ้าทุก FilterChip ถูกเลือกและถูกคลิกอีกครั้ง
+        // ให้ยกเลิกทั้ง 3 อัน
+        if (selectedChips.length == 3) {
+          selectedChips.clear();
+        }
+      }
+    });
+  }
+
   Future<void> _printUserIdFromToken(String token) async {
     try {
       final Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
@@ -162,16 +183,16 @@ class _ListState extends State<ListPage> {
     });
   }
 
-  void _toggleChip(String chipLabel) {
-    setState(() {
-      if (selectedChips.contains(chipLabel)) {
-        selectedChips.remove(chipLabel);
-      } else {
-        selectedChips.add(chipLabel);
-      }
-      updateposts();
-    });
-  }
+  // void _toggleChip(String chipLabel) {
+  //   setState(() {
+  //     if (selectedChips.contains(chipLabel)) {
+  //       selectedChips.remove(chipLabel);
+  //     } else {
+  //       selectedChips.add(chipLabel);
+  //     }
+  //     updateposts();
+  //   });
+  // }
 
   Future getIGD() async {
     var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
@@ -496,10 +517,11 @@ class _ListState extends State<ListPage> {
                         SizedBox(
                           width: 5.0,
                         ),
+
                         Wrap(
                           children: [
                             FilterChip(
-                              label: Text('food'),
+                              label: Text('FOOD'),
                               selected: selectedChips.contains('food'),
                               onSelected: (_) => _toggleChip('food'),
                               selectedColor: Color(0xFFF99417),
@@ -509,7 +531,7 @@ class _ListState extends State<ListPage> {
                               width: 5.0,
                             ),
                             FilterChip(
-                              label: Text('sweet'),
+                              label: Text('SWEET'),
                               selected: selectedChips.contains('sweet'),
                               onSelected: (_) => _toggleChip('sweet'),
                               selectedColor: Color.fromARGB(255, 247, 154, 255),
@@ -519,7 +541,7 @@ class _ListState extends State<ListPage> {
                               width: 5.0,
                             ),
                             FilterChip(
-                              label: Text('drink'),
+                              label: Text('DRINK'),
                               selected: selectedChips.contains('drink'),
                               onSelected: (_) => _toggleChip('drink'),
                               selectedColor: Color.fromARGB(255, 109, 245, 255),
@@ -712,12 +734,11 @@ class _ListState extends State<ListPage> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      '(' +
-                                                          (newPosts[reverseindex]
+                                                      (newPosts[reverseindex]
                                                                       .averageScore ??
                                                                   '0')
                                                               .toString() +
-                                                          ')', // ใช้ '0' หาก averageScore เป็น null
+                                                          ' ',
                                                       style: TextStyle(
                                                         fontSize: 10,
                                                         color: Colors.black,
@@ -727,10 +748,10 @@ class _ListState extends State<ListPage> {
                                                       Icon(
                                                         Icons.star,
                                                         color: i <=
-                                                                double.parse(newPosts[
-                                                                            reverseindex]
-                                                                        .averageScore ??
-                                                                    '0') // แปลงเป็น double โดยใช้ double.parse
+                                                                double.parse(
+                                                                    newPosts[reverseindex]
+                                                                            .averageScore ??
+                                                                        '0')
                                                             ? const Color
                                                                     .fromARGB(
                                                                 255,
@@ -740,6 +761,17 @@ class _ListState extends State<ListPage> {
                                                             : Colors.grey,
                                                         size: 12.0,
                                                       ),
+                                                    Text(
+                                                      '(' +
+                                                          (newPosts[reverseindex]
+                                                                  .numOfScores)
+                                                              .toString() +
+                                                          ')',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
                                                   ],
                                                 )
                                               ],
@@ -752,8 +784,7 @@ class _ListState extends State<ListPage> {
                                                   bottom: 50.0),
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start, // จัดเรียงข้อความด้านซ้าย
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     newPosts[reverseindex]
@@ -900,33 +931,39 @@ class _ListState extends State<ListPage> {
                                                 //     ),
                                                 //   ),
                                                 // )
-                                                ElevatedButton(
-                                                  onPressed: () async {
-                                                    bool confirmBan =
-                                                        await _showBanfirmationDialog();
-                                                    if (confirmBan) {
-                                                      await BannedController()
-                                                          .BanPost(
-                                                        postId:
-                                                            posts[reverseindex]
-                                                                .postId,
-                                                      );
+                                                Visibility(
+                                                  visible: userType == "admin",
+                                                  child: ElevatedButton(
+                                                    onPressed: () async {
+                                                      bool confirmBan =
+                                                          await _showBanfirmationDialog();
+                                                      if (confirmBan) {
+                                                        await BannedController()
+                                                            .BanPost(
+                                                          postId: posts[
+                                                                  reverseindex]
+                                                              .postId,
+                                                        );
 
-                                                      setState(() {
-                                                        getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
-                                                      });
-                                                      //print(postId);
-                                                    }
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        const Color.fromARGB(
-                                                            255, 255, 255, 255),
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.airplanemode_active,
-                                                    color: Color(0xFF363062),
+                                                        setState(() {
+                                                          getPost(); // เรียกใช้งาน getUser() เพื่อรีเฟรชหน้าจอ
+                                                        });
+                                                        //print(postId);
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              255),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.airplanemode_active,
+                                                      color: Color(0xFF363062),
+                                                    ),
                                                   ),
                                                 ),
                                               ],

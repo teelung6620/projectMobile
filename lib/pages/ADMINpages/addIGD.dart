@@ -31,6 +31,12 @@ class _AddIGDState extends State<AddIGDPage> {
   List<IngredientList> IGDResults = [];
   TextEditingController _searchController = TextEditingController();
   List<IngredientList> _searchResults = [];
+  String ingredientsName1 = '';
+  int ingredientsCal1 = 0;
+  int ingredientsUnits1 = 0;
+//IngredientsUnitsName ingredientsUnitsName = IngredientsUnitsName.gram;
+  //int ingredientsId = 0;
+
   Future getIGD() async {
     var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
     var response = await http.get(url);
@@ -46,6 +52,11 @@ class _AddIGDState extends State<AddIGDPage> {
   @override
   void initState() {
     super.initState();
+    _searchController.clear();
+    igdController.nameController.clear();
+    igdController.unitController.clear();
+    igdController.calController.clear();
+
     igdController.unitNameController.text = 'กรัม';
     getIGD();
     //_selectedItem;
@@ -123,6 +134,7 @@ class _AddIGDState extends State<AddIGDPage> {
                   );
                 } else {
                   igdController.IGDadder();
+                  getIGD();
                 }
               },
               title: 'เพิ่ม',
@@ -257,6 +269,23 @@ class _AddIGDState extends State<AddIGDPage> {
             SizedBox(
               width: 20,
             ),
+            IconButton(
+              onPressed: () {
+                // เรียกใช้ฟังก์ชัน clear สำหรับ textfield
+                _searchController.clear();
+                igdController.nameController.clear();
+                igdController.unitController.clear();
+                igdController.calController.clear();
+
+                // โหลดข้อมูลใหม่
+                getIGD();
+              },
+              icon: Icon(
+                Icons.refresh,
+                color: Colors.white,
+              ),
+            )
+
             // Center(
             //     child: InputTextFieldWidget(
             //         igdController.unitNameController, 'หน่วย')),
@@ -329,7 +358,7 @@ class _AddIGDState extends State<AddIGDPage> {
                       ),
                       IconButton(
                         onPressed: () async {
-                          final shouldRefreshData = await Navigator.push(
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => EditIGDPage(
@@ -343,12 +372,11 @@ class _AddIGDState extends State<AddIGDPage> {
                             ),
                           );
 
-                          if (shouldRefreshData == true) {
-                            setState(() {
-                              getIGD();
-                            });
-                          }
+                          setState(() {
+                            getIGD();
+                          });
                         },
+
                         icon: Icon(
                           Icons.edit,
                           color: Colors.white,

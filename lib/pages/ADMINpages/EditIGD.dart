@@ -44,17 +44,6 @@ class _EditIGDState extends State<EditIGDPage> {
   List<IngredientList> IGDResults = [];
   TextEditingController _searchController = TextEditingController();
   List<IngredientList> _searchResults = [];
-  Future getIGD() async {
-    var url = Uri.parse("http://10.0.2.2:4000/ingredients_data");
-    var response = await http.get(url);
-    IGDResults = ingredientListFromJson(response.body);
-
-    setState(() {
-      _searchResults = IGDResults.where((result) => result.ingredientsName
-          .toLowerCase()
-          .contains(_searchController.text.toLowerCase())).toList();
-    });
-  }
 
   Future _showDeleteConfirmationDialog() async {
     return showDialog(
@@ -83,11 +72,11 @@ class _EditIGDState extends State<EditIGDPage> {
               ),
               onPressed: () {
                 igdController.patchIGD(widget.ingredientsId);
-
+                Navigator.of(context).pop(true);
                 // if (image != null) {
                 //   saveUserImage();
                 // }
-                Navigator.of(context).pop(true); // ยืนยันการลบ
+                Navigator.pop(context); // ยืนยันการลบ
               },
               child: Text('ยืนยัน'),
             ),
@@ -97,14 +86,23 @@ class _EditIGDState extends State<EditIGDPage> {
     );
   }
 
+  void _navigateBack() {
+    _searchController.clear();
+    igdController.nameController.clear();
+    igdController.unitController.clear();
+    igdController.calController.clear();
+    Navigator.pop(context);
+  }
+
   @override
   void initState() {
     super.initState();
+
     igdController.nameController.text = widget.ingredientsName;
     igdController.unitController.text = widget.ingredientsUnits.toString();
     igdController.unitNameController.text = _selectedItem;
     igdController.calController.text = widget.ingredientsCal.toString();
-    getIGD();
+
     // _selectedItem = igdController.unitNameController.text;
     //_selectedItem;
   }
@@ -115,24 +113,31 @@ class _EditIGDState extends State<EditIGDPage> {
         child: Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFF4D4C7D),
-      appBar: AppBar(
-        // automaticallyImplyLeading: false,
-        title: Text(
-          'แก้ไขส่วนผสม',
-          style: TextStyle(fontSize: 25),
-        ),
-        centerTitle: true,
-        backgroundColor: Color(0xFF363062),
-        toolbarHeight: 60,
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 10),
+
             SizedBox(
               height: 10,
             ),
-
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xFF363062),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(10.0),
+                ),
+              ),
+              padding: EdgeInsets.all(20.0),
+              child: Text(
+                'EDIT INGREDIENT',
+                style: TextStyle(
+                    fontSize: 30,
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFF5F5F5)),
+              ),
+            ),
             // MyTextField2(
             //     controller: postnameController,
             //     hintText: 'name',
@@ -145,14 +150,27 @@ class _EditIGDState extends State<EditIGDPage> {
             // const SizedBox(height: 20),
 
             PostWidget(),
-
-            //_buildSearchResults(),
-            SubmitButton(
-                onPressed: () {
-                  // Call the method to save the user name
-                  _showDeleteConfirmationDialog();
-                },
-                title: 'SAVE'),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SubmitButton(
+                    onPressed: () {
+                      // Call the method to save the user name
+                      _navigateBack();
+                    },
+                    title: 'ยกเลิก'),
+                SizedBox(
+                  width: 20,
+                ),
+                SubmitButton(
+                    onPressed: () {
+                      // Call the method to save the user name
+                      _showDeleteConfirmationDialog();
+                    },
+                    title: 'เปลี่ยนแปลง'),
+              ],
+            ),
           ],
         ),
       ),

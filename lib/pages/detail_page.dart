@@ -73,6 +73,13 @@ class _DetailState extends State<DetailPage> {
     }
   }
 
+  Future<void> _refresh() async {
+    setState(() {
+      getScore();
+      fetchComments();
+    });
+  }
+
   Future<void> fetchComments() async {
     var url = Uri.parse("http://10.0.2.2:4000/comments");
     final response = await http
@@ -159,14 +166,29 @@ class _DetailState extends State<DetailPage> {
                 children: <Widget>[
                   Align(
                     alignment: Alignment.center, // กำหนดจุดศูนย์กลางให้รูปภาพ
-                    child: Image(
-                      image: NetworkImage(
-                        'http://10.0.2.2:4000/uploadPostImage/${widget.userP.postImage}',
-                      ),
+                    child: Container(
                       width: 300, // กำหนดความกว้าง
-                      height: 300,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color:
+                              const Color.fromARGB(255, 255, 255, 255), // สีขอบ
+                          width: 2.0, // ความหนาขอบ
+                        ),
+                      ),
+                      child: Image(
+                        image: NetworkImage(
+                          'http://10.0.2.2:4000/uploadPostImage/${widget.userP.postImage}',
+                        ),
+                        fit: BoxFit
+                            .cover, // กำหนดการจัดตำแหน่งรูปภาพภายใน Container
+                      ),
                     ),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
+
                   // Text(
                   //   userP.userName + '\n',
                   //   style: const TextStyle(fontSize: 20),
@@ -176,9 +198,8 @@ class _DetailState extends State<DetailPage> {
                     children: [
                       Spacer(),
                       Text(
-                        '(' +
-                            (widget.userP.averageScore ?? '0').toString() +
-                            ')', // ใช้ '0' หาก averageScore เป็น null
+                        (widget.userP.averageScore ?? '0') +
+                            ' '.toString(), // ใช้ '0' หาก averageScore เป็น null
                         style: TextStyle(
                           fontSize: 10,
                           color: const Color.fromARGB(255, 255, 255, 255),
@@ -194,8 +215,17 @@ class _DetailState extends State<DetailPage> {
                               : Colors.grey,
                           size: 12.0,
                         ),
+                      Text(
+                        ' (' +
+                            (widget.userP.numOfScores).toString() +
+                            ')', // ใช้ '0' หาก averageScore เป็น null
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: const Color.fromARGB(255, 255, 255, 255),
+                        ),
+                      ),
                       SizedBox(
-                        width: 15,
+                        width: 25,
                       ),
                     ],
                   ),
@@ -372,7 +402,6 @@ class _DetailState extends State<DetailPage> {
                               await scoreController.scorePost(widget.post_id);
                             }
 
-                            // เมื่อคะแนนถูกเพิ่มหรืออัปเดต, ส่งค่า true กลับไปยังหน้า ListPage
                             Navigator.pop(context, true);
                           },
                           child: Text('ให้คะแนน'),
@@ -430,8 +459,8 @@ class _DetailState extends State<DetailPage> {
                       visible: banned == 0,
                       child: CommentButton(
                         onPressed: () {
-                          commentsController.commentsUser(widget.userP
-                              .postId); // เรียกใช้ submitPost เมื่อปุ่มส่งถูกกด
+                          commentsController.commentsUser(widget.userP.postId);
+                          _refresh();
                         },
                         title: 'Comment',
                       ),

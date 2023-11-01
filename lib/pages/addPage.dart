@@ -296,6 +296,9 @@ class _AddState extends State<AddPage> {
                   title: 'CREATE',
                 ),
               ),
+              SizedBox(
+                height: 20,
+              ),
             ],
           ),
         ),

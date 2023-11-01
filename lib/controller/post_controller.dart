@@ -244,8 +244,7 @@ class PostController extends GetxController {
     }
   }
 
-  Future<void> deleteReport(
-      {required int postId, required int reportId}) async {
+  Future<void> deleteReport({required int reportId}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("token");
@@ -261,8 +260,7 @@ class PostController extends GetxController {
           "${ApiEndPoints.baseUrl}${ApiEndPoints.authEndpoints.DELreportPost}/$reportId");
 
       Map<String, dynamic> body = {
-        'user_id': user_id,
-        'post_id': postId,
+        'report_id': reportId,
       };
 
       http.Response response =

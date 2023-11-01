@@ -173,216 +173,241 @@ class _YourState extends State<YourPages> {
                     child: Column(
                       children: [
                         ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: posts.length,
-                          padding: EdgeInsets.all(8),
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            var reverseindex = posts.length - 1 - index;
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                width: 20,
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
+                            shrinkWrap: true,
+                            itemCount: posts.length == 0 ? 1 : posts.length,
+                            padding: EdgeInsets.all(8),
+                            physics: NeverScrollableScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              if (posts.isEmpty) {
+                                // ถ้าไม่มีโพสต์
+                                return Center(
+                                  child: Text(
+                                    'ไม่มีโพสต์ที่คุณสร้าง',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontStyle: FontStyle.italic,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFFF5F5F5)),
+                                  ),
+                                );
+                              } else {
+                                var reverseindex = posts.length - 1 - index;
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: 20,
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(255, 255, 255, 255),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => DetailPage(
-                                            userP: posts[reverseindex],
-                                            post_id: posts[reverseindex].postId,
-                                          ),
+                                    child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white,
                                         ),
-                                      );
-                                    },
-                                    child: Column(
-                                      children: [
-                                        Row(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => DetailPage(
+                                                userP: posts[reverseindex],
+                                                post_id:
+                                                    posts[reverseindex].postId,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Column(
                                           children: [
-                                            Column(
+                                            Row(
                                               children: [
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                            .only(
-                                                        top:
-                                                            10.0), // เพิ่มระยะห่างด้านบน
-                                                    child: Image(
-                                                      image: NetworkImage(
-                                                        'http://10.0.2.2:4000/uploadPostImage/${posts[reverseindex].postImage}',
+                                                Column(
+                                                  children: [
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8.0),
                                                       ),
-                                                      width: 100,
-                                                      height: 80,
-                                                      fit: BoxFit.cover,
+                                                      child: Padding(
+                                                        padding: const EdgeInsets
+                                                                .only(
+                                                            top:
+                                                                10.0), // เพิ่มระยะห่างด้านบน
+                                                        child: Image(
+                                                          image: NetworkImage(
+                                                            'http://10.0.2.2:4000/uploadPostImage/${posts[reverseindex].postImage}',
+                                                          ),
+                                                          width: 100,
+                                                          height: 80,
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
                                                     ),
-                                                  ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    Text(
+                                                      "${posts[reverseindex].totalCal} KCAL",
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: Colors.black),
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          '(' +
+                                                              (posts[reverseindex]
+                                                                          .averageScore ??
+                                                                      '0')
+                                                                  .toString() +
+                                                              ')', // ใช้ '0' หาก averageScore เป็น null
+                                                          style: TextStyle(
+                                                            fontSize: 10,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        for (int i = 1;
+                                                            i <= 5;
+                                                            i++)
+                                                          Icon(
+                                                            Icons.star,
+                                                            color: i <=
+                                                                    double.parse(
+                                                                        posts[reverseindex].averageScore ??
+                                                                            '0') // แปลงเป็น double โดยใช้ double.parse
+                                                                ? const Color
+                                                                        .fromARGB(
+                                                                    255,
+                                                                    255,
+                                                                    203,
+                                                                    59)
+                                                                : Colors.grey,
+                                                            size: 12.0,
+                                                          ),
+                                                      ],
+                                                    )
+                                                  ],
                                                 ),
                                                 SizedBox(
-                                                  height: 10,
+                                                  width: 10,
                                                 ),
-                                                Text(
-                                                  "${posts[reverseindex].totalCal} KCAL",
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      color: Colors.black),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 50.0),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start, // จัดเรียงข้อความด้านซ้าย
+                                                    children: [
+                                                      Text(
+                                                        posts[reverseindex]
+                                                            .postName,
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 20),
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                            color: Color(
+                                                                0xFF363062),
+                                                            width: 2,
+                                                          ),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          color: Color.fromARGB(
+                                                              255,
+                                                              255,
+                                                              255,
+                                                              255),
+                                                        ),
+                                                        padding:
+                                                            EdgeInsets.all(2),
+                                                        child: Text(
+                                                          posts[reverseindex]
+                                                              .userName,
+                                                          style: TextStyle(
+                                                              color: Color(
+                                                                  0xFF4D4C7D),
+                                                              fontSize: 15),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      '(' +
-                                                          (posts[reverseindex]
-                                                                      .averageScore ??
-                                                                  '0')
-                                                              .toString() +
-                                                          ')', // ใช้ '0' หาก averageScore เป็น null
-                                                      style: TextStyle(
-                                                        fontSize: 10,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                    for (int i = 1; i <= 5; i++)
-                                                      Icon(
-                                                        Icons.star,
-                                                        color: i <=
-                                                                double.parse(posts[
-                                                                            reverseindex]
-                                                                        .averageScore ??
-                                                                    '0') // แปลงเป็น double โดยใช้ double.parse
-                                                            ? const Color
-                                                                    .fromARGB(
-                                                                255,
-                                                                255,
-                                                                203,
-                                                                59)
-                                                            : Colors.grey,
-                                                        size: 12.0,
-                                                      ),
-                                                  ],
-                                                )
+                                                Spacer(),
+                                                // ElevatedButton(
+                                                //   onPressed: () {
+                                                //     Navigator.push(
+                                                //       context,
+                                                //       MaterialPageRoute(
+                                                //         builder: (context) =>
+                                                //             EditPage(
+                                                //           userP:
+                                                //               posts[reverseindex],
+                                                //           post_id:
+                                                //               posts[reverseindex]
+                                                //                   .postId,
+                                                //         ),
+                                                //       ),
+                                                //     );
+                                                //   },
+                                                //   style: ElevatedButton.styleFrom(
+                                                //     backgroundColor:
+                                                //         const Color.fromARGB(
+                                                //             255, 255, 255, 255),
+                                                //   ),
+                                                //   child: Icon(
+                                                //     Icons.edit,
+                                                //     color: Color(0xFF363062),
+                                                //   ),
+                                                // ),
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    bool confirmDelete =
+                                                        await _showDeleteConfirmationDialog();
+                                                    if (confirmDelete) {
+                                                      await PostController()
+                                                          .deletePost(
+                                                        posts[reverseindex]
+                                                            .postId,
+                                                      );
+
+                                                      setState(() {
+                                                        getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
+                                                      });
+                                                    }
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            255, 255, 255, 255),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.delete_forever_sharp,
+                                                    color: Color(0xFF363062),
+                                                  ),
+                                                ),
                                               ],
                                             ),
-                                            SizedBox(
-                                              width: 10,
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 50.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start, // จัดเรียงข้อความด้านซ้าย
-                                                children: [
-                                                  Text(
-                                                    posts[reverseindex]
-                                                        .postName,
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 20),
-                                                    textAlign: TextAlign.left,
-                                                  ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                        color:
-                                                            Color(0xFF363062),
-                                                        width: 2,
-                                                      ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                      color: Color.fromARGB(
-                                                          255, 255, 255, 255),
-                                                    ),
-                                                    padding: EdgeInsets.all(2),
-                                                    child: Text(
-                                                      posts[reverseindex]
-                                                          .userName,
-                                                      style: TextStyle(
-                                                          color:
-                                                              Color(0xFF4D4C7D),
-                                                          fontSize: 15),
-                                                      textAlign: TextAlign.left,
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            // ElevatedButton(
-                                            //   onPressed: () {
-                                            //     Navigator.push(
-                                            //       context,
-                                            //       MaterialPageRoute(
-                                            //         builder: (context) =>
-                                            //             EditPage(
-                                            //           userP:
-                                            //               posts[reverseindex],
-                                            //           post_id:
-                                            //               posts[reverseindex]
-                                            //                   .postId,
-                                            //         ),
-                                            //       ),
-                                            //     );
-                                            //   },
-                                            //   style: ElevatedButton.styleFrom(
-                                            //     backgroundColor:
-                                            //         const Color.fromARGB(
-                                            //             255, 255, 255, 255),
-                                            //   ),
-                                            //   child: Icon(
-                                            //     Icons.edit,
-                                            //     color: Color(0xFF363062),
-                                            //   ),
-                                            // ),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                bool confirmDelete =
-                                                    await _showDeleteConfirmationDialog();
-                                                if (confirmDelete) {
-                                                  await PostController()
-                                                      .deletePost(
-                                                    posts[reverseindex].postId,
-                                                  );
-
-                                                  setState(() {
-                                                    getPost(); // เรียกใช้งาน getPost() เพื่อรีเฟรชหน้าจอ
-                                                  });
-                                                }
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    const Color.fromARGB(
-                                                        255, 255, 255, 255),
-                                              ),
-                                              child: Icon(
-                                                Icons.delete_forever_sharp,
-                                                color: Color(0xFF363062),
-                                              ),
-                                            ),
                                           ],
-                                        ),
-                                      ],
-                                    )),
-                              ),
-                            );
-                          },
-                        ),
+                                        )),
+                                  ),
+                                );
+                              }
+                            }),
                       ],
                     ),
                   ),

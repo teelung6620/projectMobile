@@ -149,7 +149,15 @@ class IGDController extends GetxController {
       final response = await http.Response.fromStream(await request.send());
 
       if (response.statusCode == 200) {
-        // แบนผู้ใช้สำเร็จ
+        nameController.clear();
+        unitController.clear();
+        unitNameController.clear();
+        calController.clear();
+        Get.snackbar(
+          'สำเร็จ',
+          'เพิ่มส่วนผสมแล้ว',
+          snackPosition: SnackPosition.TOP,
+        );
         print("สำเร็จ");
         // ทำอย่างอื่นที่คุณต้องการหลังจากการแบนผู้ใช้
       } else {
